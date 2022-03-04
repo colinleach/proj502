@@ -126,3 +126,9 @@ dmypy.json
 .idea/
 
 data/gzoo.yaml
+
+*.aux
+
+*.gz
+
+*.blg

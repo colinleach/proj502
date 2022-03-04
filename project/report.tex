@@ -6,6 +6,12 @@
 \newcommand\aastex{AAS\TeX}
 \newcommand\latex{La\TeX}
 
+\newcommand{\tsub}[1]{\textsubscript{#1}}
+\newcommand{\tsup}[1]{\textsuperscript{#1}}
+\newcommand{\so}{\qquad \implies \qquad}
+\newcommand{\todo}{\color{red}{TODO}\color{black}\hspace{2mm}}
+
+
 \shorttitle{title}
 \shortauthors{Colin Leach}
 
@@ -13,12 +19,8 @@
 
 \begin{document}
 
-\title{Proposed Term Project \\Galaxy Zoo: Probabilistic Morphology through Bayesian CNNs and Active Learning}
+\title{Term Project \\Galaxy Zoo: Probabilistic Morphology through Bayesian CNNs and Active Learning}
 
-
-%\correspondingauthor{Colin Leach}
-%\email{colinleach@email.arizona.edu}
-%
 \author[0000-0003-3608-1546]{Colin Leach}
 
 \begin{abstract}
@@ -29,7 +31,17 @@ Astronomical survey data has expanded impressively since the era when profession
 
 \section{Introduction} \label{sec:intro}
 
-The need to speed up astronomical image classification using software has been clear for several years  (see Appendix for more literature background), and is increasingly urgent as new and more capable survey telescopes near completion. In \citet{walmsley_galaxy_2020} (hereafter W+20), an attempt is described to develop a human-machine hybrid strategy for galaxy morphology:
+%\paragraph{Literature Background}
+
+The Galaxy Zoo started as an attempt to scale manual classification of SDSS images by recruiting citizen scientists \citep{2008MNRAS.389.1179L}. This succeeded beyond expectations, but is struggling to keep up with new data sources: DES, Rubin, Euclid, etc. Volunteer input is increasingly regarded as a finite and valuable resource, which needs to be used more efficiently \citep{2020IAUS..341...99D}.
+
+Sorting galaxies by color has been done for decades (blue spirals, red ellipticals), though this has been criticized as inaccurate \citep{smethurst_quantifying_2022}. Other approaches include radial brightness curves, looking for central bulges and bars. Attempts to use neural networks to classify morphology go back at least to a Kaggle challenge\footnote{https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge} in 2014, won by \citet{2015MNRAS.450.1441D}. The concept of transfer learning, using older surveys to train models for a newer one, was explored by \citet{2019MNRAS.484...93D} and later by W+20, discussed in more detail in \citet{2021arXiv211012735W}. These all focus on visual images (or their redshifted equivalents), but \citet{2021arXiv211104353F} discusses an exchange of techniques with radio astronomy. A broader review of ML in astronomy is given in \citet{2020WDMKD..10.1349F}.
+
+GZ2 \citep{willett_galaxy_2013, 2016MNRAS.461.3663H} is based on SDSS DR7. Later catalogs include Galaxy Zoo: Hubble \citep{2017MNRAS.464.4176W}, CANDELS \citep{2017MNRAS.464.4420S} and DECaLS \citep{walmsley_galaxy_2022}.
+
+% my bit
+
+The need to speed up astronomical image classification using software has been clear for several years, and is increasingly urgent as new and more capable survey telescopes near completion. In \citet{walmsley_galaxy_2020} (hereafter W+20), an attempt is described to develop a human-machine hybrid strategy for galaxy morphology:
 \begin{itemize}
 	\item Use the large Galaxy Zoo 2 (GZ2) catalog to train a CNN that can classify SDSS images.
 	\item Use this model as a starting point to classify new data sources and formats, using only modest amounts of labeling from human volunteers to fine-tune the model.
