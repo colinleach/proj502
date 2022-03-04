@@ -6,6 +6,10 @@ from pathlib import Path
 
 
 class Logger:
+    """
+    Utility class to simplify logging to a file.
+    """
+
     def __init__(self, def_log: Path):
         self.def_log = def_log
         self.logfile = None
@@ -14,7 +18,7 @@ class Logger:
     def set_log(self):
         """
 
-        :return:
+        :return: None
         """
         parser = argparse.ArgumentParser(description='set logfile')
         parser.add_argument('-l', '--logfile',

@@ -7,7 +7,7 @@ from db import DB
 
 class SDSS:
     """
-
+    Class to fetch cutouts from the SDSS DR14 REST service
     """
 
     def __init__(self):
@@ -22,8 +22,8 @@ class SDSS:
     def db_read(self, limit: int = None) -> None:
         """
 
-        :param limit:
-        :return:
+        :param limit: Max files to fetch
+        :return: None
         """
 
         sql = """
@@ -37,6 +37,10 @@ class SDSS:
         self.coords = self.pg.run_select(sql)
 
     def get_one_jpeg(self, dr7id: int, ra: float, dec: float, jpeg_size: int = 424) -> int:
+        """
+
+        """
+
         img_fname = self.img_path / Path(f"{dr7id}.jpg")
         if img_fname.is_file():
             return 0
