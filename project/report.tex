@@ -25,7 +25,7 @@
 
 \begin{abstract}
 
-Astronomical survey data has expanded impressively since the era when professional astronomers could keep up with it by themselves. As an early enhancement, Galaxy Zoo used large numbers of amateur volunteers for classification of SDSS results, more recently extended to HST, CANDELS and DECaLS images. To scale further for the Rubin/Euclid era, that approach needs to be supplemented with ML techniques to use the volunteers more efficiently. \citet{walmsley_galaxy_2020} attempts to develop such a hybrid human/ML system. In line with the citizen science ethos, the code and data is readily available. The computing budget appears, at this stage, to be modest.\\
+Astronomical survey data has expanded impressively since the era when professional astronomers could keep up with it by themselves. As an early enhancement, Galaxy Zoo used large numbers of amateur volunteers for classification of SDSS results, more recently extended to HST, CANDELS and DECaLS images. To scale further for the Rubin/Euclid era, that approach needs to be supplemented with ML techniques to use the volunteers more efficiently. \citet{walmsley_galaxy_2020} attempts to develop such a hybrid human/ML system. The current term project attempts to reproduce and (perhaps) extend this work.\\
 
 \end{abstract} 
 
@@ -39,48 +39,42 @@ Sorting galaxies by color has been done for decades (blue spirals, red elliptica
 
 GZ2 \citep{willett_galaxy_2013, 2016MNRAS.461.3663H} is based on SDSS DR7. Later catalogs include Galaxy Zoo: Hubble \citep{2017MNRAS.464.4176W}, CANDELS \citep{2017MNRAS.464.4420S} and DECaLS \citep{walmsley_galaxy_2022}.
 
-% my bit
+\section{Aims}
 
-The need to speed up astronomical image classification using software has been clear for several years, and is increasingly urgent as new and more capable survey telescopes near completion. In \citet{walmsley_galaxy_2020} (hereafter W+20), an attempt is described to develop a human-machine hybrid strategy for galaxy morphology:
+In \citet{walmsley_galaxy_2020} (hereafter W+20), an attempt is described to develop a human-machine hybrid strategy for galaxy morphology:
 \begin{itemize}
 	\item Use the large Galaxy Zoo 2 (GZ2) catalog to train a CNN that can classify SDSS images.
 	\item Use this model as a starting point to classify new data sources and formats, using only modest amounts of labeling from human volunteers to fine-tune the model.
 \end{itemize}
 
 
-\section{Code and Data} \label{sec:avail}
+\section{Data} \label{sec:data}
+
+\subsection{Catalog Data} 
+
+GZ2 catalogs are available online\footnote{https://data.galaxyzoo.org/} in multiple formats, with 231 columns and nearly 300k rows as described in \citet{willett_galaxy_2013}.
+
+The table used in this work was based on \citet{2016MNRAS.461.3663H}, downloaded as \href{https://zooniverse-data.s3.amazonaws.com/galaxy-zoo-2/zoo2MainSpecz.csv.gz}{a gzipped csv file}.  This is Table 5 in \citet{willett_galaxy_2013} and the column format is described in \href{https://data.galaxyzoo.org/data/gz2/zoo2MainSpecz.txt} an accompanying file
+
+\subsection{Image Data:} 
+The GZ team do not make their images library publicly available. However, each $512 \times 512$ image is available from the SDSS cutout service, using the ra/dec coordinates in the catalog table.
+
+
+\section{Zoobot Code} \label{sec:zcode}
 
 \textbf{Code:} All the Python/Tensorflow code is on Github\footnote{https://github.com/mwalmsley/galaxy-zoo-bayesian-cnn} \citep{walmsley_mwalmsleygalaxy-zoo-bayesian-cnn_2019}, claiming to be an exact copy of that used for W+20.
 
-\textbf{Catalog Data:} GZ2 catalogs are available online\footnote{https://data.galaxyzoo.org/} in multiple formats, with 231 columns and nearly 300k rows.
 
-\textbf{Image Data:} The GZ team do not make their images library publicly available. However, each $512 \times 512$ image is available from the SDSS cutout service, using the ra/dec coordinates in the catalog table.
-
-As a possible shortcut, a set of approximately 243k images is available from Kaggle\footnote{https://www.kaggle.com/jaimetrickz/galaxy-zoo-2-images}. Some catalog information is included, but is is currently unclear how accurately this corresponds to the GZ2 catalog. This image set is about 3 GB in total, rather trivial storage requirements by ML standards.
 
 Before analysis, the images need to be downsampled to $256 \times 256$ monochrome pixels and stored as uint8.
 
-\section{Computation}
+\section{Computation} \label{sec:comp}
 
-W+20 reports that training was carried out on a p2.xlarge EC2 instance with K80 GPU, taking about 8 hours. AWS pricing for GPU-based instances is complex and Google is more opaque, but a budget under \$50 for this sort of run looks plausible\footnote{And I am not an impecunious grad student}.
+W+20 reports that training was carried out on a p2.xlarge EC2 instance with K80 GPU, taking about 8 hours. AWS pricing for GPU-based instances is complex and Google is more opaque, but a budget under \$50 for this sort of run looks plausible.
 
-Multiple computers at home are available for practice (Table \ref{tbl:cuda}). 
 
-\begin{deluxetable}{ccc|cccc}[htb!]
-	\tablecaption{Colin's CUDA-capable PCs.
-	\label{tbl:cuda}}
-	\tablewidth{0pt}
-	\tablehead{
-		& \colhead{CPU} & \colhead{RAM} & \colhead{GPU} & \colhead{cores}  & \colhead{CUDA} 
-	}
-	\startdata
-	Desktop   &  8-core i9 &  32 GB & GTX1050 & 640 & 11.2 \\
-	Laptop   &  4-core i7 &  32 GB & MX230 & 256 & 11.6 &  \\
-	\enddata
-\end{deluxetable} \vspace{-10mm}
-The GTX1050 is quite old, so a (restrained) upgrade is not ruled out.
 
-\section{Goals}
+\section{Goals} \label{sec:goals}
 
 My time is less valuable than for faculty or grad students, so goals are open-ended depending on energy, enthusiasm and (hopefully) competence. Roughly:
 \begin{enumerate}
@@ -92,16 +86,6 @@ My time is less valuable than for faculty or grad students, so goals are open-en
 \end{enumerate}
 
 I think we can assume that not all of this will be done before the end of the semester (an understatement).
-
-\appendix
-
-%\paragraph{Literature Background}
-
-The Galaxy Zoo started as an attempt to scale manual classification of SDSS images by recruiting citizen scientists \citep{2008MNRAS.389.1179L}. This succeeded beyond expectations, but is struggling to keep up with new data sources: DES, Rubin, Euclid, etc. Volunteer input is increasingly regarded as a finite and valuable resource, which needs to be used more efficiently \citep{2020IAUS..341...99D}.
-
-Sorting galaxies by color has been done for decades (blue spirals, red ellipticals), though this has been criticized as inaccurate \citep{smethurst_quantifying_2022}. Other approaches include radial brightness curves, looking for central bulges and bars. Attempts to use neural networks to classify morphology go back at least to a Kaggle challenge\footnote{https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge} in 2014, won by \citet{2015MNRAS.450.1441D}. The concept of transfer learning, using older surveys to train models for a newer one, was explored by \citet{2019MNRAS.484...93D} and later by W+20, discussed in more detail in \citet{2021arXiv211012735W}. These all focus on visual images (or their redshifted equivalents), but \citet{2021arXiv211104353F} discusses an exchange of techniques with radio astronomy. A broader review of ML in astronomy is given in \citet{2020WDMKD..10.1349F}.
-
-GZ2 \citep{willett_galaxy_2013, 2016MNRAS.461.3663H} is based on SDSS DR7. Later catalogs include Galaxy Zoo: Hubble \citep{2017MNRAS.464.4176W}, CANDELS \citep{2017MNRAS.464.4420S} and DECaLS \citep{walmsley_galaxy_2022}.
 
 
 
