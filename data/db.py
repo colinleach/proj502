@@ -3,7 +3,8 @@ import psycopg2
 import yaml
 from pathlib import Path
 
-from logger import Logger
+# from logger import Logger
+import logging
 
 
 class DB():
@@ -14,11 +15,9 @@ class DB():
     `./gzoo.yaml`.
     """
 
-    def __init__(self, logger: Logger):
+    def __init__(self):
         """
         Reads the connection parameters, makes the connection and a cursor
-
-        :param logger:
         """
 
         params = self.read_params()
@@ -29,7 +28,7 @@ class DB():
         self.connection.autocommit = True
         self.cursor = self.connection.cursor()
 
-        self.logger = logger
+        # self.logger = logger
 
     @staticmethod
     def read_params():
@@ -60,7 +59,8 @@ class DB():
         try:
             self.cursor.execute(sql)
         except Exception as e:
-            self.logger.write_log(f"{e}  when executing {sql}")
+            # self.logger.write_log(f"{e}  when executing {sql}")
+            logging.error(f"{e}  when executing {sql}")
             raise e
 
     def run_select(self, query):

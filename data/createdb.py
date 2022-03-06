@@ -77,6 +77,7 @@ class CreateDB:
         rows = self.pg.run_count('gz2data')
         self.logger.write_log(f'Added {rows[0]} records to gz2data')
 
+
 def main() -> None:
     """
 
