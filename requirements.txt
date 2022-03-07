@@ -1,26 +1,21 @@
-coverage
-python-coveralls
-pytest-cov
-pytest-mock
-pytest-xdist
-codecov
-# tensorflow=1.10 No! Don't do here, will confuse EC2 AMI. If local, install manually
+tensorflow >= 2.3 # Tested on 2.3, 2.4, 2.5.
 tqdm
-pillow~=8.0.1
+pillow
 numpy
-pandas~=1.3.5
-astropy
+pandas
 scipy
-scikit-optimize
+scikit-image
+scikit-learn
 matplotlib
-seaborn==0.9.0
-# note: photutils requires a c compiler. For Mac/xcode, run `xcode-select --install`
-photutils
-pymc3
+python-dateutil==2.8.1  # for boto3
 boto3
-dvc
-gitpython
 statsmodels
+keras_applications  # for efficientnet
+tensorflow_probability >= 0.11  # 0.11 for tf 2.3, 0.14 for tf 2.4
+pyarrow  # to read parquet, which is very handy for big datasets
+seaborn  # for nice plots
+astropy  # for reading .fits (not yet implemented, but likely to be added)
+wandb  # optional, for saving metrics to weights&biases (cloud service, free within limits)
 
 psycopg2~=2.8.6
 yaml~=0.2.5
