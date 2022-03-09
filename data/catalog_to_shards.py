@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # Write catalog to shards (tfrecords as catalog chunks) here
     parser.add_argument('--shard-type', dest='shard_type', type=str,
                     choices=shard_types,
-                    help=f'Choose ftom {shard_types}')
+                    help=f'Choose from {shard_types}')
     parser.add_argument('--shard-dir', dest='shard_dir', type=str,
                     help='Directory into which to place shard directory')
     parser.add_argument('--max-unlabelled', dest='max_unlabelled', type=int,
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     logging.basicConfig(
         filename='make_shards.log',
         # filemode='w',
-        format='%(asctime)s %(message)s',
+        format='%(asctime)s %(levelname)s:%(message)s',
         level=logging.INFO
     )
 
