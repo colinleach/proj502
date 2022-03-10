@@ -134,3 +134,5 @@ data/gzoo.yaml
 *.blg
 
 *.out
+
+training/results/

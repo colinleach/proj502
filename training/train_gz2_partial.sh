@@ -10,7 +10,7 @@ mkdir -p $EXPT_DIR
 python train_model.py \
   --pair-type gz2_partial \
   --experiment-dir $EXPT_DIR \
-  --shard-img-size 300 \
+  --shard-img-size 32 \
   --train-dir $TRAIN_DIR \
   --eval-dir $EVAL_DIR \
   --epochs 1 \

@@ -33,9 +33,6 @@ if __name__ == '__main__':
         format='%(asctime)s %(levelname)s:%(message)s',
       level=logging.INFO
     )
-    # filemode='w',
-    format = '%(message)s',
-    level = logging.INFO
 
     # useful to avoid errors on small GPU
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -45,7 +42,7 @@ if __name__ == '__main__':
 
     # check which GPU we're using
     physical_devices = tf.config.list_physical_devices('GPU') 
-    logging.info('GPUs: {}'.format(physical_devices))
+    logging.info('G\nPUs: {}'.format(physical_devices))
 
     pair_types = ['gz2', 'gz2_partial', 'decals', 'decals_partial']
 
