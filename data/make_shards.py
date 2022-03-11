@@ -60,19 +60,20 @@ class MakeShards:
     def make_shards(self,
                     shard_dir: str,
                     img_size: int,
-                    eval_size: int):
+                    eval_size: int = None):
         # in memory for now, but will be serialized for later/logs
-        train_test_fraction = create_shards.get_train_test_fraction(len(self.labelled_catalog), eval_size)
+        # train_test_fraction = create_shards.get_train_test_fraction(len(self.labelled_catalog), eval_size)
 
         labelled_columns_to_save = ['id_str'] + self.label_cols
         logging.info('Saving columns for labelled galaxies: \n{}'.format(labelled_columns_to_save))
 
         shard_config = create_shards.ShardConfig(shard_dir=shard_dir, size=img_size)
 
+        # prepare_shards() defaults to train:test:eval of 0.7 : 0.2 : 0.1 - good enough for now?
         shard_config.prepare_shards(
             self.labelled_catalog,
             self.unlabelled_catalog,
-            test_fraction=train_test_fraction,
+            # test_fraction=train_test_fraction,
             labelled_columns_to_save=labelled_columns_to_save
         )
 
@@ -95,13 +96,13 @@ def gz2_shards(labelled_catalog_loc: str,
     ms.set_catalogs(labelled_catalog_loc=labelled_catalog_loc)
     ms.make_shards(shard_dir=shard_dir,
                    img_size=256,
-                   eval_size=1000)
+                   eval_size=10000)
 
 
 if __name__ == "__main__":
     params = read_params()
     dataroot = Path(params['dataroot'])
-    # gz2_partial_shards(str(dataroot / params['catalogs'] / 'gz2_partial_pairs.csv'),
-    #                    str(dataroot / 'shards/gz2_partial'))
+    gz2_partial_shards(str(dataroot / params['catalogs'] / 'gz2_partial_pairs.csv'),
+                       str(dataroot / 'shards/gz2_partial'))
     gz2_shards(str(dataroot / params['catalogs'] / 'gz2_pairs.csv'),
                str(dataroot / 'shards/gz2'))
