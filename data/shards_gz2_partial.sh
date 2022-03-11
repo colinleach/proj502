@@ -1,13 +1,14 @@
 #!/bin/bash
 
-TOP_DIR="/home/colin/data/munch1tb/zoobot_data/shards"
-SUB_DIR=${TOP_DIR}/gz2_partial
-mkdir -p $SUB_DIR
+TOP_DIR="/home/colin/data/munch1tb/zoobot_data"
+CATALOG_DIR=${TOP_DIR}/pairs_catalogs
+SHARD_DIR=${TOP_DIR}/shards/gz2_partial
+mkdir -p $SHARD_DIR
 
 python catalog_to_shards.py \
   --shard-type 'gz2_partial' \
-  --labelled-catalog gz2_partial_pairs.csv \
-  --shard-dir $SUB_DIR \
+  --labelled-catalog ${CATALOG_DIR}/gz2_partial_pairs.csv \
+  --shard-dir $SHARD_DIR \
   --eval-size 100 \
   --max-labelled 500 \
   --max-unlabelled 300 \

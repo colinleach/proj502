@@ -1,10 +1,6 @@
 import argparse
-import logging
 
-import pandas as pd
-
-from zoobot.data_utils import create_shards
-from zoobot import label_metadata
+from make_shards import MakeShards
 
 if __name__ == '__main__':
 
@@ -22,7 +18,8 @@ if __name__ == '__main__':
     parser.add_argument('--labelled-catalog', dest='labelled_catalog_loc', type=str,
                     help='Path to csv catalog of previous labels and file_loc, for shards')
     parser.add_argument('--unlabelled-catalog', dest='unlabelled_catalog_loc', type=str, default='',
-                help='Path to csv catalog of previous labels and file_loc, for shards. Optional - skip (recommended) if all galaxies are labelled.')
+                help="""Path to csv catalog of previous labels and file_loc, for shards. 
+                Optional - skip (recommended) if all galaxies are labelled.""")
 
     parser.add_argument('--eval-size', dest='eval_size', type=int,
         help='Split labelled galaxies into train/test, with this many test galaxies (e.g. 5000)')
@@ -37,60 +34,18 @@ if __name__ == '__main__':
                     help='Max unlabelled galaxies (for debugging/speed')
     parser.add_argument('--max-labelled', dest='max_labelled', type=int,
                     help='Max labelled galaxies (for debugging/speed')
-    parser.add_argument('--img-size', dest='size', type=int,
+    parser.add_argument('--img-size', dest='img_size', type=int,
                     help='Size at which to save images (before any augmentations). 300 for DECaLS paper.')
 
-    args = parser.parse_args()
+    args: dict = parser.parse_args()
 
-    # log_loc = 'make_shards_{}.log'.format(time.time())
-    logging.basicConfig(
-        filename='make_shards.log',
-        # filemode='w',
-        format='%(asctime)s %(levelname)s:%(message)s',
-        level=logging.INFO
-    )
+    ms = MakeShards()
+    ms.set_shard_type(args.shard_type)
+    ms.set_catalogs(labelled_catalog_loc=args.labelled_catalog_loc,
+                    unlabelled_catalog_loc=args.unlabelled_catalog_loc,
+                    max_labelled=args.max_labelled,
+                    max_unlabelled=args.max_unlabelled)
+    ms.make_shards(shard_dir=args.shard_dir,
+                   img_size=args.img_size,
+                   eval_size=args.eval_size)
 
-    logging.info(f'Using {args.shard_type} label schema')
-
-    if args.shard_type == 'gz2':
-        label_cols = label_metadata.gz2_label_cols
-    elif args.shard_type == 'gz2_partial':
-        label_cols = label_metadata.gz2_partial_label_cols
-    elif args.shard_type == 'decals':
-        label_cols = label_metadata.decals_label_cols
-    elif args.shard_type == 'decals_partial':
-        label_cols = label_metadata.decals_partial_label_cols
-
-    # labels will always be floats, int conversion confuses tf.data
-    dtypes = dict(zip(label_cols, [float for _ in label_cols]))
-    dtypes['id_str'] = str
-    labelled_catalog = pd.read_csv(args.labelled_catalog_loc, dtype=dtypes)
-    if args.unlabelled_catalog_loc != '':
-        unlabelled_catalog = pd.read_csv(args.unlabelled_catalog_loc, dtype=dtypes)
-    else:
-        unlabelled_catalog = None
-
-    # limit catalogs to random subsets
-    if args.max_labelled:
-        labelled_catalog = labelled_catalog.sample(len(labelled_catalog))[:args.max_labelled]
-    if args.max_unlabelled and (unlabelled_catalog is not None):
-        unlabelled_catalog = unlabelled_catalog.sample(len(unlabelled_catalog))[:args.max_unlabelled]
-
-    logging.info('Labelled catalog: {}'.format(len(labelled_catalog)))
-    if unlabelled_catalog is not None:
-        logging.info('Unlabelled catalog: {}'.format(len(unlabelled_catalog)))
-
-    # in memory for now, but will be serialized for later/logs
-    train_test_fraction = create_shards.get_train_test_fraction(len(labelled_catalog), args.eval_size)
-
-    labelled_columns_to_save = ['id_str'] + label_cols
-    logging.info('Saving columns for labelled galaxies: \n{}'.format(labelled_columns_to_save))
-
-    shard_config = create_shards.ShardConfig(shard_dir=args.shard_dir, size=args.size)
-
-    shard_config.prepare_shards(
-        labelled_catalog,
-        unlabelled_catalog,
-        test_fraction=train_test_fraction,
-        labelled_columns_to_save=labelled_columns_to_save
-    )
