@@ -125,7 +125,7 @@ dmypy.json
 
 .idea/
 
-data/gzoo.yaml
+gzoo.yaml
 
 *.aux
 

@@ -38,7 +38,7 @@ class DB():
         :return: parameter dictionary
         """
 
-        filename = 'gzoo.yaml'
+        filename = '../gzoo.yaml'
         with open(filename) as file:
             params = yaml.full_load(file)
             return params
