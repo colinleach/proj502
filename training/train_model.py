@@ -2,6 +2,9 @@
 import os
 import logging
 import contextlib
+from time import time
+from datetime import timedelta
+from pathlib import Path
 
 import tensorflow as tf
 
@@ -21,6 +24,7 @@ class TrainModel:
             format='%(asctime)s %(levelname)s:%(message)s',
             level=logging.INFO
         )
+        logging.info("----------------------------")
         self.physical_devices()
 
     def physical_devices(self):
@@ -33,14 +37,13 @@ class TrainModel:
 
         # check which GPU we're using
         physical_devices = tf.config.list_physical_devices('GPU')
-        logging.info('G\nPUs: {}'.format(physical_devices))
+        logging.info('GPUs: {}'.format(physical_devices))
 
     def set_paths(self,
-                  train_records_dir: str,
-                  eval_records_dir: str,
+                  shards_dir: Path,
                   save_dir: str):
-        self.train_records_dir = train_records_dir
-        self.eval_records_dir = eval_records_dir
+        self.train_records_dir = shards_dir / 'train_shards'
+        self.eval_records_dir = shards_dir / 'val_shards'
         self.save_dir = save_dir
 
         assert save_dir is not None
@@ -87,16 +90,17 @@ class TrainModel:
             logging.info('Using single GPU, not distributed')
             self.context_manager = contextlib.nullcontext()  # does nothing, just a convenience for clean code
 
-    def training(self,
-                 initial_size: int,
-                 resize_size: int,
-                 batch_size: int,
-                 epochs: int,
-                 dropout_rate: float = 0.2,
-                 always_augment: bool = False,
-                 eager: bool = False
-                 ):
+    def train(self,
+             initial_size: int,
+             resize_size: int,
+             batch_size: int,
+             epochs: int,
+             dropout_rate: float = 0.2,
+             always_augment: bool = False,
+             eager: bool = False
+             ):
 
+        start = time()
         train_records = [os.path.join(self.train_records_dir, x)
                          for x in os.listdir(self.train_records_dir) if x.endswith('.tfrecord')]
         eval_records = [os.path.join(self.eval_records_dir, x)
@@ -122,7 +126,6 @@ class TrainModel:
         test_dataset = preprocess.preprocess_dataset(raw_test_dataset, preprocess_config)
 
         with self.context_manager:
-
             model = define_model.get_model(
                 output_dim=len(self.schema.label_cols),
                 input_size=initial_size,
@@ -139,17 +142,17 @@ class TrainModel:
             loss = lambda x, y: multiquestion_loss(x, y) / batch_size
             # loss = multiquestion_loss
             
-            model.compile(
-                loss=loss,
-                optimizer=tf.keras.optimizers.Adam()
-            )
-            model.summary()
-            
-            train_config = training_config.TrainConfig(
-                log_dir=self.save_dir,
-                epochs=epochs,
-                patience=10
-            )
+        model.compile(
+            loss=loss,
+            optimizer=tf.keras.optimizers.Adam()
+        )
+        model.summary()
+
+        train_config = training_config.TrainConfig(
+            log_dir=self.save_dir,
+            epochs=epochs,
+            patience=10
+        )
 
         # inplace on model
         training_config.train_estimator(
@@ -159,10 +162,35 @@ class TrainModel:
             test_dataset,
             eager=eager  # set this True (or use --eager) for easier debugging, but slower training
         )
+        elapsed = timedelta(seconds=(time() - start))
+        logging.info(f"Finished training in {elapsed}")
         
 def train_gz2_partial(params: dict):
-    print(params, type(params))
+    dataroot = Path(params['dataroot'])
+    tm = TrainModel()
+    tm.set_paths(shards_dir=str(dataroot / 'shards/gz2_partial'),
+                 save_dir='results/gz2_partial')
+    tm.set_schema('gz2_partial')
+    tm.set_channels()
+    tm.set_context_manager()
+    tm.train(initial_size=32,
+             resize_size=128,
+             batch_size=8,
+             epochs=2)
+
+def train_gz2(params: dict):
+    dataroot = Path(params['dataroot'])
+    tm = TrainModel()
+    tm.set_paths(shards_dir=dataroot / 'shards/gz2',
+                 save_dir='results/gz2')
+    tm.set_schema('gz2')
+    tm.set_channels()
+    tm.set_context_manager()
+    tm.train(initial_size=256,
+             resize_size=128,
+             batch_size=64, # tried 128, ran out of memory
+             epochs=200)
 
 if __name__ == '__main__':
     params = read_params()
-    train_gz2_partial(params)
+    train_gz2(params)
