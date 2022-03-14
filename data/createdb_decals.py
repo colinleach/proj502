@@ -24,6 +24,8 @@ class ParquetToDB:
         self.params = read_params()
         pq_file = Path(self.params['dataroot']) / self.params[key]
         self.df = pq.read_table(pq_file).to_pandas()
+        # need to fix column names to be valid in postgres
+        self.df.columns = [c.replace('-', '_') for c in self.df.columns]
 
     @staticmethod
     def psql_insert_copy(table, conn, keys, data_iter):
@@ -36,7 +38,7 @@ class ParquetToDB:
             writer.writerows(data_iter)
             s_buf.seek(0)
 
-            columns = ', '.join(f'"{k}"' for k in keys)
+            columns = ', '.join([k for k in keys])
             if table.schema:
                 table_name = 'f{table.schema}.{table.name}'
             else:
