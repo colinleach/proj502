@@ -48,6 +48,19 @@ In \citet{walmsley_galaxy_2020} (hereafter W+20), an attempt is described to dev
 \end{itemize}
 
 
+\section{Code} \label{sec:code}
+
+\subsection{Zoobot Code} \label{sec:zcode}
+
+\textbf{Code:} All the Python/Tensorflow code is on Github\footnote{https://github.com/mwalmsley/galaxy-zoo-bayesian-cnn} \citep{walmsley_mwalmsleygalaxy-zoo-bayesian-cnn_2019}, claiming to be an exact copy of that used for W+20.
+
+Perhaps more interesting is the zoobot repo\footnote{https://github.com/mwalmsley/zoobot}, a fork which is still under active development. This extends the project to DECaLS (Dark Energy Camera Legacy Survey) data, as described in \citet{2021MNRAS} (hereafter W+21). It also has much better documentation\footnote{https://zoobot.readthedocs.io/} than the earlier code.
+
+\subsection{Code for Term Project}
+
+Python code and documentation associated with ASTR 502 is available on Github\footnote{https://github.com/colinleach/proj502}. This aims to cover both GZ2, as in W+20, and DECaLS, as in W+21.
+
+
 \section{Data} \label{sec:data}
 
 \subsection{Catalog Data} 
@@ -59,19 +72,17 @@ The table used in this work was based on \citet{2016MNRAS.461.3663H}, downloaded
 \subsection{Image Data:} 
 The GZ team do not make their images library publicly available. However, each $512 \times 512$ image is available from the SDSS cutout service, using the ra/dec coordinates in the catalog table.
 
-
-\section{Zoobot Code} \label{sec:zcode}
-
-\textbf{Code:} All the Python/Tensorflow code is on Github\footnote{https://github.com/mwalmsley/galaxy-zoo-bayesian-cnn} \citep{walmsley_mwalmsleygalaxy-zoo-bayesian-cnn_2019}, claiming to be an exact copy of that used for W+20.
-
-
-
 Before analysis, the images need to be downsampled to $256 \times 256$ monochrome pixels and stored as uint8.
+
+
 
 \section{Computation} \label{sec:comp}
 
-W+20 reports that training was carried out on a p2.xlarge EC2 instance with K80 GPU, taking about 8 hours. AWS pricing for GPU-based instances is complex and Google is more opaque, but a budget under \$50 for this sort of run looks plausible.
+W+20 reports that GZ2 training was carried out on a p2.xlarge EC2 instance with K80 GPU, taking about 8 hours. For DECaLS, the GPU was upgraded to a V100.
 
+Experiments with the GPUs available at the start of this project rapidly proved that 2GB of GPU memory is wholly inadequate for training a CNN. Upgrading to a 6GB GTX 1660 (\$450, and compatible with the existing motherboard and PSU) allowed some progress. However, this still proved limiting for batch size as discussed below.
+
+\todo Colab and AWS
 
 
 \section{Goals} \label{sec:goals}
@@ -87,7 +98,28 @@ My time is less valuable than for faculty or grad students, so goals are open-en
 
 I think we can assume that not all of this will be done before the end of the semester (an understatement).
 
+\section{Workflow}
 
+In outline, these are the steps required:
+
+\begin{enumerate}
+	\item Get the Galaxy Zoo catalog data for each survey of interest.
+	\item Get the image files (JPG or PNG), one per galaxy in the classification.
+	\item Make a combined catalog, including a path to the image on disk plus the data fields relevant to the model.
+	\item Split the galaxies into train, evaluate and test sets. For each, prepare a binary tensor (tfrecord) file containing image and classification data.
+	\item Train the model on the train and evaluate sets.
+	\item Predict results with the test set and compare with the GZ classification.
+\end{enumerate}
+
+The following subsections address each of these in more detail.
+
+\subsection{GZ data}
+
+GZ2 files were downloaded from the Galaxy Zoo website.
+
+\subsection{Images}
+
+xxx
 
 \bibliography{GZML}{}
 \bibliographystyle{aasjournal}

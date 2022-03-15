@@ -86,11 +86,16 @@ Walmsley, M., Smith, L., Lintott, C., {et~al.} 2020, {\textbackslash}mnras,
   e-prints, arXiv:2110.12735.
 \newblock \doarXiv{2110.12735}
 
+\bibitem[{Walmsley {et~al.}(2021)Walmsley, Lintott, Géron, Kruk, Krawczyk,
+  Willett, Bamford, Kelvin, Fortson, Gal, Keel, Masters, Mehta, Simmons,
+  Smethurst, Smith, Baeten, \& Macmillan}]{2021MNRAS}
+Walmsley, M., Lintott, C., Géron, T., {et~al.} 2021, Monthly Notices of the
+  Royal Astronomical Society, 509, 3966–3988, \dodoi{10.1093/mnras/stab2093}
+
 \bibitem[{Walmsley {et~al.}(2022)Walmsley, Lintott, Géron, Kruk, Krawczyk,
   Willett, Bamford, Kelvin, Fortson, Gal, Keel, Masters, Mehta, Simmons,
   Smethurst, Smith, Baeten, \& Macmillan}]{walmsley_galaxy_2022}
-Walmsley, M., Lintott, C., Géron, T., {et~al.} 2022, {\textbackslash}mnras,
-  509, 3966, \dodoi{10.1093/mnras/stab2093}
+---. 2022, {\textbackslash}mnras, 509, 3966, \dodoi{10.1093/mnras/stab2093}
 
 \bibitem[{Willett {et~al.}(2013)Willett, Lintott, Bamford, Masters, Simmons,
   Casteels, Edmondson, Fortson, Kaviraj, Keel, Melvin, Nichol, Raddick,
