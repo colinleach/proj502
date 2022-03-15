@@ -101,6 +101,8 @@ class TrainModel:
              ):
 
         start = time()
+        logging.info(f"Started training with epochs={epochs}, batch_size={batch_size}")
+
         train_records = [os.path.join(self.train_records_dir, x)
                          for x in os.listdir(self.train_records_dir) if x.endswith('.tfrecord')]
         val_records = [os.path.join(self.val_records_dir, x)
@@ -179,7 +181,7 @@ def train_gz2_partial(params: dict):
              batch_size=8,
              epochs=2)
 
-def train_gz2(params: dict):
+def train_gz2(params: dict, batch_size: int = 128, epochs: int = 100):
     dataroot = Path(params['dataroot'])
     tm = TrainModel()
     tm.set_paths(shards_dir=dataroot / 'shards/gz2',
@@ -189,9 +191,22 @@ def train_gz2(params: dict):
     tm.set_context_manager()
     tm.train(initial_size=256,
              resize_size=128,
-             batch_size=64, # tried 128, ran out of memory locally
-             epochs=70)
+             batch_size=batch_size, # tried 128, ran out of memory locally
+             epochs=epochs)
+
+def train_decals(params: dict, batch_size: int = 128, epochs: int = 100):
+    dataroot = Path(params['dataroot'])
+    tm = TrainModel()
+    tm.set_paths(shards_dir=dataroot / 'shards/decals',
+                 save_dir=f'results/decals/{datetime.now().strftime("%Y%m%d-%H%M%S")}')
+    tm.set_schema('decals')
+    tm.set_channels()
+    tm.set_context_manager()
+    tm.train(initial_size=300,
+             resize_size=224,
+             batch_size=batch_size,
+             epochs=epochs)
 
 if __name__ == '__main__':
     params = read_params()
-    train_gz2(params)
+    train_gz2(params, batch_size=32, epochs=100)
