@@ -1,5 +1,6 @@
 %%
 %\documentclass[twocolumn, tighten]{aastex63}
+%\documentclass[twocolumn, twocolappendix, tighten]{aastex631}
 \documentclass[twocolumn, twocolappendix, tighten]{aastex631}
 
 \newcommand{\vdag}{(v)^\dagger}
@@ -67,7 +68,7 @@ Python code and documentation associated with ASTR 502 is available on Github\fo
 
 GZ2 catalogs are available online\footnote{https://data.galaxyzoo.org/} in multiple formats, with 231 columns and nearly 300k rows as described in \citet{willett_galaxy_2013}.
 
-The table used in this work was based on \citet{2016MNRAS.461.3663H}, downloaded as \href{https://zooniverse-data.s3.amazonaws.com/galaxy-zoo-2/zoo2MainSpecz.csv.gz}{a gzipped csv file}.  This is Table 5 in \citet{willett_galaxy_2013} and the column format is described in \href{https://data.galaxyzoo.org/data/gz2/zoo2MainSpecz.txt} an accompanying file
+The table used in this work was based on \citet{2016MNRAS.461.3663H}, downloaded as \href{https://zooniverse-data.s3.amazonaws.com/galaxy-zoo-2/zoo2MainSpecz.csv.gz}{a gzipped csv file}.  This is Table 5 in \citet{willett_galaxy_2013} and the column format is described in \href{https://data.galaxyzoo.org/data/gz2/zoo2MainSpecz.txt}{an accompanying file}.
 
 \subsection{Image Data:} 
 The GZ team do not make their images library publicly available. However, each $512 \times 512$ image is available from the SDSS cutout service, using the ra/dec coordinates in the catalog table.
@@ -80,7 +81,7 @@ Before analysis, the images need to be downsampled to $256 \times 256$ monochrom
 
 W+20 reports that GZ2 training was carried out on a p2.xlarge EC2 instance with K80 GPU, taking about 8 hours. For DECaLS, the GPU was upgraded to a V100.
 
-Experiments with the GPUs available at the start of this project rapidly proved that 2GB of GPU memory is wholly inadequate for training a CNN. Upgrading to a 6GB GTX 1660 (\$450, and compatible with the existing motherboard and PSU) allowed some progress. However, this still proved limiting for batch size as discussed below.
+Experiments with the GPUs available at the start of this project rapidly proved that 2GB of GPU memory is wholly inadequate for training a CNN. Upgrading to a 6GB GTX 1660 (far from state of the art, but only \$450 and compatible with the existing motherboard and PSU) allowed some progress. However, this still proved limiting for batch size as discussed below.
 
 \todo Colab and AWS
 
@@ -116,10 +117,21 @@ The following subsections address each of these in more detail.
 \subsection{GZ data}
 
 GZ2 files were downloaded from the Galaxy Zoo website.
+There are a total of 243,500 rows in the table. For better consistency, only those marked 'original' in the sample field were used in subsequent analyses, a set of 211,922.
+
+Extensive DECaLS data is available from Zenodo \citep{walmsley_mike_2020_4573248}. For this study the file 'gz\_decals\_volunteers\_5.parquet' was used, a total of 253,286 rows.
+
+For maximum flexibility (and because old habits die hard), all this data was stored in a PostgreSQL database, running locally.
 
 \subsection{Images}
 
-xxx
+The RA and Dec fields in the GZ2 dataset were used to fetch $424 \times 424$ JPG cutouts from the \href{http://skyserver.sdss.org/dr14/SkyServerWS/ImgCutout/getjpeg}{SDSS SkyServer}. Because Zoobot is currently configured to use PNG images, the Python code converted each file with PIL. The PNG files totaled around 33 GB, much more than the corresponding JPG files.
+
+DECaLS DR5 images were downloaded from Zenodo \citep{walmsley_mike_2020_4573248} as 4 ZIP files, unpacked to 272,725 $424 \times 424$ PNG files totaling 83 GB. 
+
+File paths and some metadata was stored in PostgeSQL.
+
+
 
 \bibliography{GZML}{}
 \bibliographystyle{aasjournal}

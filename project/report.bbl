@@ -73,11 +73,19 @@ Smethurst, R.~J., Masters, K.~L., Simmons, B.~D., {et~al.} 2022,
 \bibitem[{Walmsley(2019)}]{walmsley_mwalmsleygalaxy-zoo-bayesian-cnn_2019}
 Walmsley, M. 2019, Zenodo, \dodoi{10.5281/zenodo.2677874}
 
-\bibitem[{Walmsley {et~al.}(2020)Walmsley, Smith, Lintott, Gal, Bamford,
-  Dickinson, Fortson, Kruk, Masters, Scarlata, Simmons, Smethurst, \&
+\bibitem[{Walmsley {et~al.}(2020{\natexlab{a}})Walmsley, Smith, Lintott, Gal,
+  Bamford, Dickinson, Fortson, Kruk, Masters, Scarlata, Simmons, Smethurst, \&
   Wright}]{walmsley_galaxy_2020}
-Walmsley, M., Smith, L., Lintott, C., {et~al.} 2020, {\textbackslash}mnras,
-  491, 1554, \dodoi{10.1093/mnras/stz2816}
+Walmsley, M., Smith, L., Lintott, C., {et~al.} 2020{\natexlab{a}},
+  {\textbackslash}mnras, 491, 1554, \dodoi{10.1093/mnras/stz2816}
+
+\bibitem[{Walmsley {et~al.}(2020{\natexlab{b}})Walmsley, Lintott, Tobias, Kruk,
+  Krawczyk, Willett, Bamford, Kelvin, Fortson, Gal, Keel, Masters, Mehta,
+  Simmons, Smethurst, Smith, Baeten, \& Macmillan}]{walmsley_mike_2020_4573248}
+Walmsley, M., Lintott, C., Tobias, G., {et~al.} 2020{\natexlab{b}}, {Galaxy Zoo
+  DECaLS: Detailed Visual Morphology Measurements from Volunteers and Deep
+  Learning for 314,000 Galaxies}, 0.0.2,  Zenodo,
+  \dodoi{10.5281/zenodo.4573248}
 
 \bibitem[{{Walmsley} {et~al.}(2021){Walmsley}, {Scaife}, {Lintott}, {Lochner},
   {Etsebeth}, {G{\'e}ron}, {Dickinson}, {Fortson}, {Kruk}, {Masters}, {Mantha},
