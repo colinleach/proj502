@@ -3,7 +3,7 @@ import os
 import logging
 import contextlib
 from time import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 from pathlib import Path
 
 import tensorflow as tf
@@ -43,7 +43,7 @@ class TrainModel:
                   shards_dir: Path,
                   save_dir: str):
         self.train_records_dir = shards_dir / 'train_shards'
-        self.eval_records_dir = shards_dir / 'val_shards'
+        self.val_records_dir = shards_dir / 'val_shards'
         self.save_dir = save_dir
 
         assert save_dir is not None
@@ -103,14 +103,14 @@ class TrainModel:
         start = time()
         train_records = [os.path.join(self.train_records_dir, x)
                          for x in os.listdir(self.train_records_dir) if x.endswith('.tfrecord')]
-        eval_records = [os.path.join(self.eval_records_dir, x)
-                        for x in os.listdir(self.eval_records_dir) if x.endswith('.tfrecord')]
+        val_records = [os.path.join(self.val_records_dir, x)
+                        for x in os.listdir(self.val_records_dir) if x.endswith('.tfrecord')]
 
         raw_train_dataset = tfrecord_datasets.get_tfrecord_dataset(train_records,
                                                                    self.schema.label_cols, batch_size,
                                                                    shuffle=True,
                                                                    drop_remainder=True)
-        raw_test_dataset = tfrecord_datasets.get_tfrecord_dataset(eval_records,
+        raw_val_dataset = tfrecord_datasets.get_tfrecord_dataset(val_records,
                                                                   self.schema.label_cols, batch_size,
                                                                   shuffle=False,
                                                                   drop_remainder=True)
@@ -123,7 +123,7 @@ class TrainModel:
             normalise_from_uint8=False  # False for tfrecords with 0-1 floats, True for png/jpg with 0-255 uints
         )
         train_dataset = preprocess.preprocess_dataset(raw_train_dataset, preprocess_config)
-        test_dataset = preprocess.preprocess_dataset(raw_test_dataset, preprocess_config)
+        val_dataset = preprocess.preprocess_dataset(raw_val_dataset, preprocess_config)
 
         with self.context_manager:
             model = define_model.get_model(
@@ -144,7 +144,8 @@ class TrainModel:
             
         model.compile(
             loss=loss,
-            optimizer=tf.keras.optimizers.Adam()
+            optimizer=tf.keras.optimizers.Adam(),
+            metrics=[tf.keras.metrics.CategoricalAccuracy()]
         )
         model.summary()
 
@@ -159,7 +160,7 @@ class TrainModel:
             model,
             train_config,  # parameters for how to train e.g. epochs, patience
             train_dataset,
-            test_dataset,
+            val_dataset,
             eager=eager  # set this True (or use --eager) for easier debugging, but slower training
         )
         elapsed = timedelta(seconds=(time() - start))
@@ -182,14 +183,14 @@ def train_gz2(params: dict):
     dataroot = Path(params['dataroot'])
     tm = TrainModel()
     tm.set_paths(shards_dir=dataroot / 'shards/gz2',
-                 save_dir='results/gz2')
+                 save_dir=f'results/gz2/{datetime.now().strftime("%Y%m%d-%H%M%S")}')
     tm.set_schema('gz2')
     tm.set_channels()
     tm.set_context_manager()
     tm.train(initial_size=256,
              resize_size=128,
-             batch_size=64, # tried 128, ran out of memory
-             epochs=200)
+             batch_size=64, # tried 128, ran out of memory locally
+             epochs=70)
 
 if __name__ == '__main__':
     params = read_params()

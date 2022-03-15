@@ -1,8 +1,8 @@
 tensorflow >= 2.3 # Tested on 2.3, 2.4, 2.5.
 tqdm
-pillow
+pillow~=9.0.1
 numpy
-pandas
+pandas~=1.4.1
 scipy
 scikit-image
 scikit-learn
@@ -12,7 +12,7 @@ boto3
 statsmodels
 keras_applications  # for efficientnet
 tensorflow_probability >= 0.11  # 0.11 for tf 2.3, 0.14 for tf 2.4
-pyarrow  # to read parquet, which is very handy for big datasets
+pyarrow~=7.0.0
 seaborn  # for nice plots
 astropy  # for reading .fits (not yet implemented, but likely to be added)
 wandb  # optional, for saving metrics to weights&biases (cloud service, free within limits)
@@ -21,3 +21,5 @@ psycopg2~=2.8.6
 yaml~=0.2.5
 pyyaml~=6.0
 requests~=2.27.1
+zoobot~=0.0.1
+sqlalchemy~=1.4.32

@@ -136,3 +136,5 @@ gzoo.yaml
 *.out
 
 training/results/
+
+data/Untitled.ipynb
