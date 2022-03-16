@@ -145,7 +145,7 @@ For debugging, a much smaller GZ2 shard set was also created, with fewer records
 
 \subsection{Training}
 
-As expected, this proved a slow step in the workflow and exposed the limitations of the local (6 GB) GPU. A batch size of 128 was used in the published work. For GZ2, this caused an immediate GPU out-of-memory error. Dropping to 64 was more successful, as in Figure \ref{fig:gz2_train_64}. 
+As expected, this proved a slow step in the workflow and exposed the limitations of the local (6 GB) GPU. A batch size of 128 was used in the published work. For GZ2, this caused an immediate GPU out-of-memory error. Dropping to batches of 64 was more successful, as in Figure \ref{fig:gz2_train_64}, though this used most of the available GPU memory. Progressing at about 10 min/epoch, the training loss drops smoothly and reached stopping criteria (\todo) after 54 epochs, 8.3 hours. However, the evaluation loss (??) is noisy and suggests rather poor generalization.
 
 \begin{figure}[htb!]
 	\plotone{gz2_train_64}
@@ -153,19 +153,21 @@ As expected, this proved a slow step in the workflow and exposed the limitations
 		\label{fig:gz2_train_64}}
 \end{figure}
 
+For DECaLS, the batch size needed to be reduced to 32 to fit in GPU memory. Training is slower (about 30 min/epoch) but the results are more encouraging, as shown in Figure \ref{fig:decals_train}. After some initial spikes, the evaluation loss tracks closely with the training loss. This run failed to reach stopping criteria within the epoch limit (40 epochs, nearly 19 hours) but looks good enough to progress with.
 
+It is not immediately clear why the DECaLS run looks better than the GZ2 run. Preparation of data shards uses the same code and no error has yet been found. Other hypotheses include the different batch size and different image size. Batch size is easiest to test, so GZ2 training was repeated with batches of 32 as in Figure \ref{fig:gz2_train_32}. This is not encouraging: training now looks worse without evaluation looking better.
 
 \begin{figure}[htb!]
 	\plotone{decals_train}
-	\caption{First training run.
+	\caption{
 		\label{fig:decals_train}}
 \end{figure}
 
-
+\todo image size
 
 \begin{figure}[htb!]
 	\plotone{gz2_train_32}
-	\caption{First training run.
+	\caption{
 		\label{fig:gz2_train_32}}
 \end{figure}
 
