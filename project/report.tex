@@ -131,6 +131,43 @@ DECaLS DR5 images were downloaded from Zenodo \citep{walmsley_mike_2020_4573248}
 
 File paths and some metadata was stored in PostgeSQL.
 
+\subsection{Combined catalog}
+
+Having everything in PostgreSQL makes it easy to join the data and image tables and select the desired columns. Each resulting dataset was converted to a pandas DataFrame and saved as a CSV file. This is quick and produces relatively small files (around 35 MB).
+
+Zoobot requires the columns to have the correct names and appear in the correct order. A galaxy identifier is in 'id\_str' and a full path to the PNG is in 'file\_loc', then the remaining columns contain total votes cast for each answer in the GZ decision tree.
+
+\subsection{Tensor shards}
+
+Before training, input data needs to be converted to a tfrecord format that TensorFlow can read quickly. The combined catalog is split into train, evaluate and test sets; for this project a 7:2:1 ratio was used. For each set, image files are read and undergo initial cropping and resizing before combining with the GZ votes and written to binary tfrecord files. This took around 1 hour per survey (i9 processor, local SSD storage) and the output files total about 100 GB.
+
+For debugging, a much smaller GZ2 shard set was also created, with fewer records and low-resolution images. This proved valuable in quickly finding some minor bugs in the current Zoobot repo: apparently it was tested mainly with DECaLS data and there are some typos in the GZ2 code. Accordingly, from this point the project uses my fork of the mwalmsley/zoobot repo. A PR with the corrections will be submitted upstream once everything is working correctly.
+
+\subsection{Training}
+
+As expected, this proved a slow step in the workflow and exposed the limitations of the local (6 GB) GPU. A batch size of 128 was used in the published work. For GZ2, this caused an immediate GPU out-of-memory error. Dropping to 64 was more successful, as in Figure \ref{fig:gz2_train_64}. 
+
+\begin{figure}[htb!]
+	\plotone{gz2_train_64}
+	\caption{
+		\label{fig:gz2_train_64}}
+\end{figure}
+
+
+
+\begin{figure}[htb!]
+	\plotone{decals_train}
+	\caption{First training run.
+		\label{fig:decals_train}}
+\end{figure}
+
+
+
+\begin{figure}[htb!]
+	\plotone{gz2_train_32}
+	\caption{First training run.
+		\label{fig:gz2_train_32}}
+\end{figure}
 
 
 \bibliography{GZML}{}
