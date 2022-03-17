@@ -99,6 +99,23 @@ My time is less valuable than for faculty or grad students, so goals are open-en
 
 I think we can assume that not all of this will be done before the end of the semester (an understatement).
 
+\section{Algorithms}
+
+\subsection{What are we trying to predict?}
+
+decision tree
+
+\begin{figure}[htb!]
+	\plotone{decals_decisions}
+	\caption{The GZ decision tree used for DECaLS DR5
+		\label{fig:decals_decisions}}
+\end{figure}
+
+
+\subsection{ML model}
+
+EfficientNet B0
+
 \section{Workflow}
 
 In outline, these are the steps required:
@@ -123,7 +140,7 @@ Extensive DECaLS data is available from Zenodo \citep{walmsley_mike_2020_4573248
 
 For maximum flexibility (and because old habits die hard), all this data was stored in a PostgreSQL database, running locally.
 
-\subsection{Images}
+\subsection{Images} \label{images}
 
 The RA and Dec fields in the GZ2 dataset were used to fetch $424 \times 424$ JPG cutouts from the \href{http://skyserver.sdss.org/dr14/SkyServerWS/ImgCutout/getjpeg}{SDSS SkyServer}. Because Zoobot is currently configured to use PNG images, the Python code converted each file with PIL. The PNG files totaled around 33 GB, much more than the corresponding JPG files.
 
@@ -155,7 +172,7 @@ As expected, this proved a slow step in the workflow and exposed the limitations
 
 For DECaLS, the batch size needed to be reduced to 32 to fit in GPU memory. Training is slower (about 30 min/epoch) but the results are more encouraging, as shown in Figure \ref{fig:decals_train}. After some initial spikes, the evaluation loss tracks closely with the training loss. This run failed to reach stopping criteria within the epoch limit (40 epochs, nearly 19 hours) but looks good enough to progress with.
 
-It is not immediately clear why the DECaLS run looks better than the GZ2 run. Preparation of data shards uses the same code and no error has yet been found. Other hypotheses include the different batch size and different image size. Batch size is easiest to test, so GZ2 training was repeated with batches of 32 as in Figure \ref{fig:gz2_train_32}. This is not encouraging: training now looks worse without evaluation looking better.
+It is not immediately clear why the DECaLS run looks better than the GZ2 run. Preparation of data shards uses the same code and no error has yet been found. Other hypotheses include the different batch size and different image size and quality. Batch size is easiest to test, so GZ2 training was repeated with batches of 32 as in Figure \ref{fig:gz2_train_32}. This is not encouraging: training now looks worse without evaluation looking better.
 
 \begin{figure}[htb!]
 	\plotone{decals_train}
@@ -163,13 +180,19 @@ It is not immediately clear why the DECaLS run looks better than the GZ2 run. Pr
 		\label{fig:decals_train}}
 \end{figure}
 
-\todo image size
+Images obtained from DECaLS are inherently higher resolution and deeper than those from SDSS used in GZ2 (bigger telescope, newer camera). Training was also carried out on differently sized images: $300 \times 300$ for DECaLS and $256 \times256$ for GZ2 (\todo CHECK).
+
+There are also significant differences in image preparation. W+20 gives little detail about this for GZ2, so the simple method described in section \ref{images} was followed.  In contrast, W+21 describes a more complex process, starting from FITS data files at native telescope resolution. Something equivalent may be possible for SDSS, but as this is not an urgent priority for an ASTR 502 term paper it may be better to focus on the DECaLS survey.
+
+\todo Find galaxies imaged in both surveys to compare by eye
 
 \begin{figure}[htb!]
 	\plotone{gz2_train_32}
 	\caption{
 		\label{fig:gz2_train_32}}
 \end{figure}
+
+\section{Predictions}
 
 
 \bibliography{GZML}{}
