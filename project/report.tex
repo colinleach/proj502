@@ -12,6 +12,34 @@
 \newcommand{\so}{\qquad \implies \qquad}
 \newcommand{\todo}{\color{red}{TODO}\color{black}\hspace{2mm}}
 
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=mystyle}
 
 \shorttitle{title}
 \shortauthors{Colin Leach}
@@ -99,11 +127,11 @@ My time is less valuable than for faculty or grad students, so goals are open-en
 
 I think we can assume that not all of this will be done before the end of the semester (an understatement).
 
-\section{Algorithms}
+\section{Algorithms} \label{algorithms}
 
 \subsection{What are we trying to predict?}
 
-decision tree
+Galaxy Zoo catalogs are not just a simple classification, such as elliptical vs spiral. The questions posed to volunteers follow a decision tree which sepends on the answer to previous questions. The version for DECaLS is shown in Figure \ref{fig:decals_decisions}; GZ2 is similar but slightly simpler.
 
 \begin{figure}[htb!]
 	\plotone{decals_decisions}
@@ -111,10 +139,32 @@ decision tree
 		\label{fig:decals_decisions}}
 \end{figure}
 
+In the Python code this is represented by two dictionaries: for questions/answers and for dependencies. The Q\&A version is shown below: keys are questions, values are lists of allowed answers (as a suffix which will be appended to the question). The dependency dictionary lists previous questions that would allow the current question to be reached.
 
-\subsection{ML model}
+\begin{lstlisting}[language=Python]
+decals_pairs = {
+	'smooth-or-featured': ['_smooth', '_featured-or-disk', '_artifact'],
+	'disk-edge-on': ['_yes', '_no'],
+	'has-spiral-arms': ['_yes', '_no'],
+	'bar': ['_strong', '_weak', '_no'],
+	'bulge-size': ['_dominant', '_large', '_moderate', '_small', '_none'],
+	'how-rounded': ['_round', '_in-between', '_cigar-shaped'],
+	'edge-on-bulge': ['_boxy', '_none', '_rounded'],
+	'spiral-winding': ['_tight', '_medium', '_loose'],
+	'spiral-arm-count': ['_1', '_2', '_3', '_4', '_more-than-4', '_cant-tell'],
+	'merging': ['_none', '_minor-disturbance', '_major-disturbance', '_merger']
+}
+\end{lstlisting}
 
-EfficientNet B0
+Thus there are 10 possible questions (not all of which will be asked in each case), and 34 possible answers. Each answer has its own field in the input to the model (in addition to an identifier and the image), and the training output includes a weighting for each. The prediction step then takes a new galaxy and produces a probability for each of the possible answers.
+
+\todo Dirichlet?
+
+\subsection{ML model} \label{model}
+
+This evolved during the development of Zoobot. For W+20 and the mwalmsley/galaxy-zoo-bayesian-cnn repo, the architecture was a cut-down version of VGG16 \citep{??}. For W+21 and mwalmsley/zoobot it had been updated to EfficientNet B0 \citep{??}. The latter was used in the current work.
+
+\todo Details
 
 \section{Workflow}
 
@@ -148,6 +198,16 @@ DECaLS DR5 images were downloaded from Zenodo \citep{walmsley_mike_2020_4573248}
 
 File paths and some metadata was stored in PostgeSQL.
 
+Although the survey telescopes are at different latitudes (SDSS at Apache Point, NM; DECaLS at Cerro Tololo, Chile) there is significant overlap in coverage (Figure \ref{fig:coverage}).
+
+\begin{figure}[htb!]
+	\plotone{coverage.png}
+	\caption{Sky locations of images used for each survey
+		\label{fig:coverage}}
+\end{figure}
+
+
+
 \subsection{Combined catalog}
 
 Having everything in PostgreSQL makes it easy to join the data and image tables and select the desired columns. Each resulting dataset was converted to a pandas DataFrame and saved as a CSV file. This is quick and produces relatively small files (around 35 MB).
@@ -158,7 +218,7 @@ Zoobot requires the columns to have the correct names and appear in the correct 
 
 Before training, input data needs to be converted to a tfrecord format that TensorFlow can read quickly. The combined catalog is split into train, evaluate and test sets; for this project a 7:2:1 ratio was used. For each set, image files are read and undergo initial cropping and resizing before combining with the GZ votes and written to binary tfrecord files. This took around 1 hour per survey (i9 processor, local SSD storage) and the output files total about 100 GB.
 
-For debugging, a much smaller GZ2 shard set was also created, with fewer records and low-resolution images. This proved valuable in quickly finding some minor bugs in the current Zoobot repo: apparently it was tested mainly with DECaLS data and there are some typos in the GZ2 code. Accordingly, from this point the project uses my fork of the mwalmsley/zoobot repo. A PR with the corrections will be submitted upstream once everything is working correctly.
+For debugging, a much smaller GZ2 shard set was also created, with fewer records and low-resolution images. This proved valuable in quickly finding some minor bugs in the current Zoobot repo: apparently it was tested mainly with DECaLS data and there are some typos and omissions in the GZ2 code. Accordingly, from this point the project uses my fork of the mwalmsley/zoobot repo. A PR with the corrections will be submitted upstream once everything is working correctly.
 
 \subsection{Training}
 
