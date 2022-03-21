@@ -8,10 +8,10 @@ from pathlib import Path
 
 import tensorflow as tf
 
-from zoobot.data_utils import tfrecord_datasets
-from zoobot.training import training_config, losses
-from zoobot.estimators import preprocess, define_model
-from zoobot import schemas, label_metadata
+from zoobot.tensorflow.data_utils import tfrecord_datasets
+from zoobot.tensorflow.training import training_config, losses
+from zoobot.tensorflow.estimators import preprocess, define_model
+from zoobot.shared import schemas, label_metadata
 
 from data.utils import read_params
 
@@ -207,6 +207,7 @@ def train_decals(params: dict, batch_size: int = 128, epochs: int = 100):
              batch_size=batch_size,
              epochs=epochs)
 
+
 if __name__ == '__main__':
     params = read_params()
-    train_gz2(params, batch_size=32, epochs=100)
+    train_decals(params, batch_size=32, epochs=100)

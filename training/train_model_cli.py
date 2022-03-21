@@ -1,4 +1,8 @@
 import argparse
+from pathlib import Path
+
+from train_model import TrainModel
+
 
 if __name__ == '__main__':
     """
@@ -19,8 +23,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--pair-type', dest='pair_type', type=str,
-                    choices=pair_types,
-                    help=f'Choose from {pair_types}')
+                        choices=pair_types,
+                        help=f'Choose from {pair_types}')
     parser.add_argument('--experiment-dir', dest='save_dir', type=str)
     parser.add_argument('--shard-img-size', dest='shard_img_size', type=int, default=300)
     parser.add_argument('--resize-size', dest='resize_size', type=int, default=224)
@@ -40,3 +44,14 @@ if __name__ == '__main__':
         but may be unexpected and mess with e.g. GradCAM techniques.'),
     parser.add_argument('--dropout-rate', dest='dropout_rate', default=0.2, type=float)
     args = parser.parse_args()
+
+    tm = TrainModel()
+    tm.set_paths(shards_dir=args.,
+                 save_dir=f'results/gz2/{datetime.now().strftime("%Y%m%d-%H%M%S")}')
+    tm.set_schema('gz2')
+    tm.set_channels()
+    tm.set_context_manager()
+    tm.train(initial_size=256,
+             resize_size=128,
+             batch_size=64, # tried 128, ran out of memory locally
+             epochs=70)

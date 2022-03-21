@@ -4,7 +4,7 @@ import pandas as pd
 
 from utils import read_params
 from db import DB
-from zoobot.label_metadata import gz2_pairs, decals_pairs, decals_partial_pairs
+from zoobot.shared.label_metadata import gz2_pairs, decals_pairs, decals_partial_pairs
 
 
 class Catalog:
