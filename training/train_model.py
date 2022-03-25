@@ -147,6 +147,7 @@ class TrainModel:
         model.compile(
             loss=loss,
             optimizer=tf.keras.optimizers.Adam(),
+            # not happy about the next line
             metrics=[tf.keras.metrics.CategoricalAccuracy()]
         )
         model.summary()

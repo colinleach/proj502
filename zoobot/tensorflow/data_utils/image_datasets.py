@@ -59,13 +59,15 @@ def get_image_dataset(image_paths, file_format, requested_img_size, batch_size, 
         file_format (str): image format e.g. png, jpeg
         requested_img_size (int): e.g. 256 for 256x256x3 image. Assumed square. Will resize if size on disk != this.
         batch_size (int): batch size to use when grouping images into batches
-        labels (list or None): If not None, include labels in dataset (see Returns). Must be equal length to image_paths. Defaults to None.
+        labels (list or None): If not None, include labels in dataset (see Returns).
+        Must be equal length to image_paths. Defaults to None.
 
     Raises:
         FileNotFoundError: at least one path does not match an existing file
 
     Returns:
-        tf.data.Dataset: yielding batches with 'matrix' key for image array, 'id_str' for the image path, and 'label' if ``labels`` was provided.
+        tf.data.Dataset: yielding batches with 'matrix' key for image array,
+        'id_str' for the image path, and 'label' if ``labels`` was provided.
     """
     
     assert len(image_paths) > 0
