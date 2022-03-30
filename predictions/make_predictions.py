@@ -2,6 +2,7 @@ import os
 import logging
 import glob
 from typing import List
+from pathlib import Path
 
 import pandas as pd
 
@@ -11,7 +12,7 @@ from zoobot.shared import label_metadata
 from zoobot.tensorflow.data_utils import image_datasets
 from zoobot.tensorflow.estimators import define_model, preprocess
 from zoobot.tensorflow.predictions import predict_on_tfrecords, predict_on_dataset
-
+from data.utils import read_params
 
 class MakePredictions:
     """
@@ -155,6 +156,12 @@ class MakePredictions:
         n_samples = 5
         predict_on_dataset.predict(self.image_ds, model, n_samples, label_cols, save_loc)
 
+
+def decals():
+    mp = MakePredictions()
+    params = read_params()
+    dataset = Path(params['dataroot']) / params['']
+    mp.set_existing_dataset(Path)
 
 if __name__ == '__main__':
     pass
