@@ -65,10 +65,18 @@
 {Simmons}, B.~D., {Lintott}, C., {Willett}, K.~W., {et~al.} 2017, \mnras, 464,
   4420, \dodoi{10.1093/mnras/stw2587}
 
+\bibitem[{{Simonyan} \& {Zisserman}(2014)}]{2014arXiv1409.1556S}
+{Simonyan}, K., \& {Zisserman}, A. 2014, arXiv e-prints, arXiv:1409.1556.
+\newblock \doarXiv{1409.1556}
+
 \bibitem[{Smethurst {et~al.}(2022)Smethurst, Masters, Simmons, Garland, Géron,
   Häußler, Kruk, Lintott, O'Ryan, \& Walmsley}]{smethurst_quantifying_2022}
 Smethurst, R.~J., Masters, K.~L., Simmons, B.~D., {et~al.} 2022,
   {\textbackslash}mnras, 510, 4126, \dodoi{10.1093/mnras/stab3607}
+
+\bibitem[{{Tan} \& {Le}(2019)}]{2019arXiv190511946T}
+{Tan}, M., \& {Le}, Q.~V. 2019, arXiv e-prints, arXiv:1905.11946.
+\newblock \doarXiv{1905.11946}
 
 \bibitem[{Walmsley(2019)}]{walmsley_mwalmsleygalaxy-zoo-bayesian-cnn_2019}
 Walmsley, M. 2019, Zenodo, \dodoi{10.5281/zenodo.2677874}
@@ -87,23 +95,11 @@ Walmsley, M., Lintott, C., Tobias, G., {et~al.} 2020{\natexlab{b}}, {Galaxy Zoo
   Learning for 314,000 Galaxies}, 0.0.2,  Zenodo,
   \dodoi{10.5281/zenodo.4573248}
 
-\bibitem[{{Walmsley} {et~al.}(2021){Walmsley}, {Scaife}, {Lintott}, {Lochner},
-  {Etsebeth}, {G{\'e}ron}, {Dickinson}, {Fortson}, {Kruk}, {Masters}, {Mantha},
-  \& {Simmons}}]{2021arXiv211012735W}
-{Walmsley}, M., {Scaife}, A. M.~M., {Lintott}, C., {et~al.} 2021, arXiv
-  e-prints, arXiv:2110.12735.
-\newblock \doarXiv{2110.12735}
-
 \bibitem[{Walmsley {et~al.}(2021)Walmsley, Lintott, Géron, Kruk, Krawczyk,
   Willett, Bamford, Kelvin, Fortson, Gal, Keel, Masters, Mehta, Simmons,
   Smethurst, Smith, Baeten, \& Macmillan}]{2021MNRAS}
 Walmsley, M., Lintott, C., Géron, T., {et~al.} 2021, Monthly Notices of the
   Royal Astronomical Society, 509, 3966–3988, \dodoi{10.1093/mnras/stab2093}
-
-\bibitem[{Walmsley {et~al.}(2022)Walmsley, Lintott, Géron, Kruk, Krawczyk,
-  Willett, Bamford, Kelvin, Fortson, Gal, Keel, Masters, Mehta, Simmons,
-  Smethurst, Smith, Baeten, \& Macmillan}]{walmsley_galaxy_2022}
----. 2022, {\textbackslash}mnras, 509, 3966, \dodoi{10.1093/mnras/stab2093}
 
 \bibitem[{Willett {et~al.}(2013)Willett, Lintott, Bamford, Masters, Simmons,
   Casteels, Edmondson, Fortson, Kaviraj, Keel, Melvin, Nichol, Raddick,

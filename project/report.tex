@@ -1,11 +1,12 @@
 %%
 %\documentclass[twocolumn, tighten]{aastex63}
 %\documentclass[twocolumn, twocolappendix, tighten]{aastex631}
-\documentclass[twocolumn, twocolappendix, tighten]{aastex631}
+%\documentclass[twocolumn, twocolappendix, tighten]{aastex631}
+\documentclass[preprint]{aastex631}
 
-\newcommand{\vdag}{(v)^\dagger}
-\newcommand\aastex{AAS\TeX}
-\newcommand\latex{La\TeX}
+%\newcommand{\vdag}{(v)^\dagger}
+%\newcommand\aastex{AAS\TeX}
+%\newcommand\latex{La\TeX}
 
 \newcommand{\tsub}[1]{\textsubscript{#1}}
 \newcommand{\tsup}[1]{\textsuperscript{#1}}
@@ -41,10 +42,10 @@
 
 \lstset{style=mystyle}
 
-\shorttitle{title}
+\shorttitle{Galaxy Zoo Morphology}
 \shortauthors{Colin Leach}
 
-\graphicspath{{./}{figures/}}
+\graphicspath{{figures/}{./}}
 
 \begin{document}
 
@@ -64,13 +65,13 @@ Astronomical survey data has expanded impressively since the era when profession
 
 The Galaxy Zoo started as an attempt to scale manual classification of SDSS images by recruiting citizen scientists \citep{2008MNRAS.389.1179L}. This succeeded beyond expectations, but is struggling to keep up with new data sources: DES, Rubin, Euclid, etc. Volunteer input is increasingly regarded as a finite and valuable resource, which needs to be used more efficiently \citep{2020IAUS..341...99D}.
 
-Sorting galaxies by color has been done for decades (blue spirals, red ellipticals), though this has been criticized as inaccurate \citep{smethurst_quantifying_2022}. Other approaches include radial brightness curves, looking for central bulges and bars. Attempts to use neural networks to classify morphology go back at least to a Kaggle challenge\footnote{https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge} in 2014, won by \citet{2015MNRAS.450.1441D}. The concept of transfer learning, using older surveys to train models for a newer one, was explored by \citet{2019MNRAS.484...93D} and later by W+20, discussed in more detail in \citet{2021arXiv211012735W}. These all focus on visual images (or their redshifted equivalents), but \citet{2021arXiv211104353F} discusses an exchange of techniques with radio astronomy. A broader review of ML in astronomy is given in \citet{2020WDMKD..10.1349F}.
+Sorting galaxies by color has been done for decades (blue spirals, red ellipticals), though this has been criticized as inaccurate \citep{smethurst_quantifying_2022}. Other approaches include radial brightness curves, looking for central bulges and bars. Attempts to use neural networks to classify morphology go back at least to a \href{https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge}{Kaggle challenge} in 2014, won by \citet{2015MNRAS.450.1441D}. The concept of transfer learning, using older surveys to train models for a newer one, was explored by \citet{2019MNRAS.484...93D} and later by \citet{walmsley_galaxy_2020} (hereafter W+20), discussed in more detail in \citet{2021MNRAS} (hereafter W+21). These all focus on visual images (or their equivalents redshifted to IR), but \citet{2021arXiv211104353F} discusses an exchange of techniques with radio astronomy. A broader review of ML in astronomy is given in \citet{2020WDMKD..10.1349F}.
 
-GZ2 \citep{willett_galaxy_2013, 2016MNRAS.461.3663H} is based on SDSS DR7. Later catalogs include Galaxy Zoo: Hubble \citep{2017MNRAS.464.4176W}, CANDELS \citep{2017MNRAS.464.4420S} and DECaLS \citep{walmsley_galaxy_2022}.
+THe GZ2 catalog \citep{willett_galaxy_2013, 2016MNRAS.461.3663H} is based on SDSS DR7. Later catalogs include Galaxy Zoo: Hubble \citep{2017MNRAS.464.4176W}, CANDELS \citep{2017MNRAS.464.4420S} and DECaLS (W+21).
 
 \section{Aims}
 
-In \citet{walmsley_galaxy_2020} (hereafter W+20), an attempt is described to develop a human-machine hybrid strategy for galaxy morphology:
+In W+20, an attempt is described to develop a human-machine hybrid strategy for galaxy morphology:
 \begin{itemize}
 	\item Use the large Galaxy Zoo 2 (GZ2) catalog to train a CNN that can classify SDSS images.
 	\item Use this model as a starting point to classify new data sources and formats, using only modest amounts of labeling from human volunteers to fine-tune the model.
@@ -81,28 +82,13 @@ In \citet{walmsley_galaxy_2020} (hereafter W+20), an attempt is described to dev
 
 \subsection{Zoobot Code} \label{sec:zcode}
 
-\textbf{Code:} All the Python/Tensorflow code is on Github\footnote{https://github.com/mwalmsley/galaxy-zoo-bayesian-cnn} \citep{walmsley_mwalmsleygalaxy-zoo-bayesian-cnn_2019}, claiming to be an exact copy of that used for W+20.
+Python/Tensorflow code is on Github\footnote{https://github.com/mwalmsley/galaxy-zoo-bayesian-cnn} \citep{walmsley_mwalmsleygalaxy-zoo-bayesian-cnn_2019}, claiming to be an exact copy of that used for W+20.
 
-Perhaps more interesting is the zoobot repo\footnote{https://github.com/mwalmsley/zoobot}, a fork which is still under active development. This extends the project to DECaLS (Dark Energy Camera Legacy Survey) data, as described in \citet{2021MNRAS} (hereafter W+21). It also has much better documentation\footnote{https://zoobot.readthedocs.io/} than the earlier code.
+Perhaps more interesting is the zoobot repo\footnote{https://github.com/mwalmsley/zoobot}, a fork which is still under active development. This extends the project to DECaLS (Dark Energy Camera Legacy Survey) data, as described in W+21. It also has \href{https://zoobot.readthedocs.io/}{much better documentation} than the earlier code.
 
 \subsection{Code for Term Project}
 
 Python code and documentation associated with ASTR 502 is available on Github\footnote{https://github.com/colinleach/proj502}. This aims to cover both GZ2, as in W+20, and DECaLS, as in W+21.
-
-
-\section{Data} \label{sec:data}
-
-\subsection{Catalog Data} 
-
-GZ2 catalogs are available online\footnote{https://data.galaxyzoo.org/} in multiple formats, with 231 columns and nearly 300k rows as described in \citet{willett_galaxy_2013}.
-
-The table used in this work was based on \citet{2016MNRAS.461.3663H}, downloaded as \href{https://zooniverse-data.s3.amazonaws.com/galaxy-zoo-2/zoo2MainSpecz.csv.gz}{a gzipped csv file}.  This is Table 5 in \citet{willett_galaxy_2013} and the column format is described in \href{https://data.galaxyzoo.org/data/gz2/zoo2MainSpecz.txt}{an accompanying file}.
-
-\subsection{Image Data:} 
-The GZ team do not make their images library publicly available. However, each $512 \times 512$ image is available from the SDSS cutout service, using the ra/dec coordinates in the catalog table.
-
-Before analysis, the images need to be downsampled to $256 \times 256$ monochrome pixels and stored as uint8.
-
 
 
 \section{Computation} \label{sec:comp}
@@ -118,22 +104,23 @@ Experiments with the GPUs available at the start of this project rapidly proved 
 
 My time is less valuable than for faculty or grad students, so goals are open-ended depending on energy, enthusiasm and (hopefully) competence. Roughly:
 \begin{enumerate}
-	\item Get the published code running on my local machine, using whatever cut-down training set proves viable.
+	\item Get the published Keras code running on my local machine, using whatever cut-down training sets (GZ2 and DECaLS) prove viable.
 	\item Deploy the code on either AWS or Google.
-	\item Extend the model to other data such as Hubble, CANDELS, DECaLS, for which there is already some GZ classification.
-	\item Think about newer CNN algorithms. The W+20 paper was submitted in 2019, but software decisions were made well before then and the authors admit it is not the latest technology.
-	\item Rewrite using other frameworks, for my education. Most obviously PyTorch, but (unlike most astronomers!) I would also be interested to try Julia with Flux. As a stretch goal, I may try getting it working in F\#/ML.NET, but don't hold your breath waiting for that.
+	\item Repeat for PyTorch code
+	\item Extend the model to other data such as Hubble or CANDELS, for which there is already some GZ classification.
+	\item Rewrite using other languages and frameworks, for my education: Julia with Flux; maybe F\#/ML.NET.
 \end{enumerate}
 
-I think we can assume that not all of this will be done before the end of the semester (an understatement).
+Not all of this will be done before the end of the semester (an understatement).
 
 \section{Algorithms} \label{algorithms}
 
 \subsection{What are we trying to predict?}
 
-Galaxy Zoo catalogs are not just a simple classification, such as elliptical vs spiral. The questions posed to volunteers follow a decision tree which sepends on the answer to previous questions. The version for DECaLS is shown in Figure \ref{fig:decals_decisions}; GZ2 is similar but slightly simpler.
+Galaxy Zoo catalogs are not just a simple classification, such as elliptical vs spiral. The questions posed to volunteers have evolved over the years, though all follow a decision tree which depends on the answer to previous questions. The version for DECaLS DR5 is shown in Figure \ref{fig:decals_decisions}; GZ2 is similar but slightly simpler.
 
 \begin{figure}[htb!]
+	\epsscale{0.7}
 	\plotone{decals_decisions}
 	\caption{The GZ decision tree used for DECaLS DR5
 		\label{fig:decals_decisions}}
@@ -162,10 +149,48 @@ Thus there are 10 possible questions (not all of which will be asked in each cas
 
 \subsection{ML model} \label{model}
 
-This evolved during the development of Zoobot. For W+20 and the mwalmsley/galaxy-zoo-bayesian-cnn repo, the architecture was a cut-down version of VGG16 \citep{??}. For W+21 and mwalmsley/zoobot it had been updated to EfficientNet B0 \citep{??}. The latter was used in the current work.
+This evolved during the development of Zoobot. For W+20 and the mwalmsley/galaxy-zoo-bayesian-cnn repo, the architecture was a cut-down version of VGG16 \citep{2014arXiv1409.1556S}. For W+21 and mwalmsley/zoobot it had been updated to EfficientNet B0 \citep{2019arXiv190511946T}. The latter was used in the current work.
 
 \todo Details
 
+\begin{deluxetable}{llc}[htb!]
+	\tablecaption{Output from TensorFlow model.summary()
+		\label{tbl:tfmodel}}
+	\tablewidth{0pt}
+	\tablehead{
+		\colhead{Layer} & \colhead{Output Shape} & \colhead{Param \#} 
+	}
+	\startdata
+		random rotation & (None, 300, 300, 1) & 0 \\        
+		random flip & (None, 300, 300, 1) & 0 \\       
+		random crop & (None, 224, 224, 1) & 0 \\        
+		sequential 1 & (None, 7, 7, 1280) & 4048988 \\
+		global avg pooling 2d & (None, 1280) & 0 \\      
+		top dropout & (None, 1280) & 0 \\        
+		dense & (None, 34) & 43554     
+	\enddata
+\end{deluxetable} \vspace{-10mm}
+
+
+\subsection{Loss Function}
+
+In W+20 volunteer responses were modeled as binomially distributed
+
+\begin{equation}
+ \mathcal{L} = \int \mathrm{Bin} (k | \rho, N)\, \mathrm{Beta} (\rho | \alpha, \beta)\, d\alpha\, d\beta 
+\end{equation}
+
+To address some limitations, W+21 modified this to use the multinomial equavalent of each function, replacing $\mathrm{Binomial} (k | \rho, N)$ with $\mathrm{Multinomial} (\vec{k} | \vec{\rho}, N)$ and $\mathrm{Beta} (\rho | \alpha, \beta)$ with $\mathrm{Dirichlet} (\vec{\rho} | \vec{\alpha})$:
+
+\begin{equation}
+ \mathcal{L} = \int \mathrm{Multi} (\vec{k} | \vec{\rho}, N)\, \mathrm{Dirichlet} (\vec{\rho} | \vec{\alpha})\, d\vec{\alpha} 
+\end{equation}
+
+The parameters are now vectors with one element per answer.
+
+\subsection{Output}
+
+\todo
 \section{Workflow}
 
 In outline, these are the steps required:
@@ -174,7 +199,7 @@ In outline, these are the steps required:
 	\item Get the Galaxy Zoo catalog data for each survey of interest.
 	\item Get the image files (JPG or PNG), one per galaxy in the classification.
 	\item Make a combined catalog, including a path to the image on disk plus the data fields relevant to the model.
-	\item Split the galaxies into train, evaluate and test sets. For each, prepare a binary tensor (tfrecord) file containing image and classification data.
+	\item Split the galaxies into train, evaluate and test sets. For each, prepare a binary-format tensor (tfrecord) file containing image and classification data.
 	\item Train the model on the train and evaluate sets.
 	\item Predict results with the test set and compare with the GZ classification.
 \end{enumerate}
@@ -183,7 +208,7 @@ The following subsections address each of these in more detail.
 
 \subsection{GZ data}
 
-GZ2 files were downloaded from the Galaxy Zoo website.
+GZ2 catalog files were downloaded from the Galaxy Zoo website.
 There are a total of 243,500 rows in the table. For better consistency, only those marked 'original' in the sample field were used in subsequent analyses, a set of 211,922.
 
 Extensive DECaLS data is available from Zenodo \citep{walmsley_mike_2020_4573248}. For this study the file 'gz\_decals\_volunteers\_5.parquet' was used, a total of 253,286 rows.
@@ -192,7 +217,7 @@ For maximum flexibility (and because old habits die hard), all this data was sto
 
 \subsection{Images} \label{images}
 
-The RA and Dec fields in the GZ2 dataset were used to fetch $424 \times 424$ JPG cutouts from the \href{http://skyserver.sdss.org/dr14/SkyServerWS/ImgCutout/getjpeg}{SDSS SkyServer}. Because Zoobot is currently configured to use PNG images, the Python code converted each file with PIL. The PNG files totaled around 33 GB, much more than the corresponding JPG files.
+The GZ team do not make their images library publicly available, so the RA and Dec fields in the GZ2 dataset were used to fetch $424 \times 424$ JPG cutouts from the \href{http://skyserver.sdss.org/dr14/SkyServerWS/ImgCutout/getjpeg}{SDSS SkyServer}. Because Zoobot is currently configured to use PNG images, the Python code converted each file with PIL. The PNG files totaled around 33 GB, much more than the corresponding JPG files.
 
 DECaLS DR5 images were downloaded from Zenodo \citep{walmsley_mike_2020_4573248} as 4 ZIP files, unpacked to 272,725 $424 \times 424$ PNG files totaling 83 GB. 
 
@@ -201,7 +226,8 @@ File paths and some metadata was stored in PostgeSQL.
 Although the survey telescopes are at different latitudes (SDSS at Apache Point, NM; DECaLS at Cerro Tololo, Chile) there is significant overlap in coverage (Figure \ref{fig:coverage}).
 
 \begin{figure}[htb!]
-	\plotone{coverage.png}
+	\epsscale{0.6}
+	\plotone{coverage_cropped}
 	\caption{Sky locations of images used for each survey
 		\label{fig:coverage}}
 \end{figure}
@@ -222,38 +248,40 @@ For debugging, a much smaller GZ2 shard set was also created, with fewer records
 
 \subsection{Training}
 
-As expected, this proved a slow step in the workflow and exposed the limitations of the local (6 GB) GPU. A batch size of 128 was used in the published work. For GZ2, this caused an immediate GPU out-of-memory error. Dropping to batches of 64 was more successful, as in Figure \ref{fig:gz2_train_64}, though this used most of the available GPU memory. Progressing at about 10 min/epoch, the training loss drops smoothly and reached stopping criteria (\todo) after 54 epochs, 8.3 hours. However, the evaluation loss (??) is noisy and suggests rather poor generalization.
+As expected, this proved a slow step in the workflow and exposed the limitations of the local (6 GB) GPU. A batch size of 128 was used in the published work. For GZ2, this caused an immediate GPU out-of-memory error. Dropping to batches of 64 was more successful, as in Figure \ref{fig:train_plots}(a), though this used most of the available GPU memory. Progressing at about 10 min/epoch, the training loss drops smoothly and reached stopping criteria (\todo) after 54 epochs, 8.3 hours. However, the evaluation loss (??) is noisy and suggests rather poor generalization.
 
-\begin{figure}[htb!]
-	\plotone{gz2_train_64}
-	\caption{
-		\label{fig:gz2_train_64}}
+
+\begin{figure}
+	\gridline{\fig{gz2_train_64.pdf}{0.4\textwidth}{(a)}
+			  \fig{decals_train.pdf}{0.4\textwidth}{(b)}}
+	\gridline{\fig{gz2_train_32.pdf}{0.4\textwidth}{(c)}
+		      \fig{decals_train.pdf}{0.4\textwidth}{(d)}}
+	\caption{Training runs for GZ2 (left) and DECaLS (right) \label{fig:train_plots}}
 \end{figure}
 
-For DECaLS, the batch size needed to be reduced to 32 to fit in GPU memory. Training is slower (about 30 min/epoch) but the results are more encouraging, as shown in Figure \ref{fig:decals_train}. After some initial spikes, the evaluation loss tracks closely with the training loss. This run failed to reach stopping criteria within the epoch limit (40 epochs, nearly 19 hours) but looks good enough to progress with.
 
-It is not immediately clear why the DECaLS run looks better than the GZ2 run. Preparation of data shards uses the same code and no error has yet been found. Other hypotheses include the different batch size and different image size and quality. Batch size is easiest to test, so GZ2 training was repeated with batches of 32 as in Figure \ref{fig:gz2_train_32}. This is not encouraging: training now looks worse without evaluation looking better.
+For DECaLS, the batch size needed to be reduced to 32 to fit in GPU memory. Training is slower (about 30 min/epoch) but the results are more encouraging, as shown in Figure \ref{fig:train_plots}(b). After some initial spikes, the evaluation loss tracks closely with the training loss. This run failed to reach stopping criteria within the epoch limit (40 epochs, nearly 19 hours) but looks good enough to progress with.
 
-\begin{figure}[htb!]
-	\plotone{decals_train}
-	\caption{
-		\label{fig:decals_train}}
-\end{figure}
+It is not immediately clear why the DECaLS run looks better than the GZ2 run. Preparation of data shards uses the same code and no error has yet been found. Other hypotheses include the different batch size and different image size and quality. Batch size is easiest to test, so GZ2 training was repeated with batches of 32 as in Figure \ref{fig:train_plots}(c). This is not encouraging: training now looks worse without evaluation looking better.
 
-Images obtained from DECaLS are inherently higher resolution and deeper than those from SDSS used in GZ2 (bigger telescope, newer camera). Training was also carried out on differently sized images: $300 \times 300$ for DECaLS and $256 \times256$ for GZ2 (\todo CHECK).
+Images obtained from DECaLS are inherently higher resolution and deeper than those from SDSS used in GZ2 (bigger telescope, newer camera). Training was also carried out on differently sized images: $300 \times 300$ for DECaLS and $256 \times256$ for GZ2.
 
 There are also significant differences in image preparation. W+20 gives little detail about this for GZ2, so the simple method described in section \ref{images} was followed.  In contrast, W+21 describes a more complex process, starting from FITS data files at native telescope resolution. Something equivalent may be possible for SDSS, but as this is not an urgent priority for an ASTR 502 term paper it may be better to focus on the DECaLS survey.
 
-\todo Find galaxies imaged in both surveys to compare by eye
+The respective catalogs share no common ID field, but a match on RA/Dec coordinates identified 132,722 images which are in both data sets. A few representative examples are shown in Figure \ref{fig:images}. Clearly there is a major difference in quality.
 
-\begin{figure}[htb!]
-	\plotone{gz2_train_32}
-	\caption{
-		\label{fig:gz2_train_32}}
+\todo Repeat with GZ2 images zoomed in
+
+\begin{figure}
+	\gridline{\fig{J110001.05+010644.0.pdf}{0.6\textwidth}{(a)}}
+	\gridline{\fig{J110459.08+121820.3.pdf}{0.6\textwidth}{(b)}}
+	\caption{Raw images used for GZ2 (left) and DECaLS (right) \label{fig:images}}
 \end{figure}
+
 
 \section{Predictions}
 
+\todo
 
 \bibliography{GZML}{}
 \bibliographystyle{aasjournal}
