@@ -1,7 +1,7 @@
 import requests
 from pathlib import Path
 
-from logger import Logger
+# from logger import Logger
 from db import DB
 
 
@@ -11,8 +11,8 @@ class SDSS:
     """
 
     def __init__(self):
-        self.logger = Logger(Path('gzoo.log'))
-        self.pg = DB(self.logger)
+        # self.logger = Logger(Path('gzoo.log'))
+        self.pg = DB()
         params = self.pg.read_params()
         self.img_path = params['sdssdr7']
         # self.datafile = params['datafile']
@@ -61,7 +61,7 @@ class SDSS:
             downloaded = self.get_one_jpeg(dr7objid, ra, dec, jpeg_size)
             count += downloaded
 
-        self.logger.write_log(f"{count} images written to {self.img_path}")
+        # self.logger.write_log(f"{count} images written to {self.img_path}")
 
 if __name__ == "__main__":
     sdss = SDSS()
