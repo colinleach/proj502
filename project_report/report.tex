@@ -63,7 +63,7 @@ Astronomical survey data has expanded impressively since the era when profession
 
 %\paragraph{Literature Background}
 
-The Galaxy Zoo started as an attempt to scale manual classification of SDSS images by recruiting citizen scientists \citep{2008MNRAS.389.1179L}. This succeeded beyond expectations, but is struggling to keep up with new data sources: DES, Rubin, Euclid, etc. Volunteer input is increasingly regarded as a finite and valuable resource, which needs to be used more efficiently \citep{2020IAUS..341...99D}.
+The Galaxy Zoo started as an attempt to scale manual classification of SDSS images by recruiting citizen scientists \citep{2008MNRAS.389.1179L, lintott_crowd_2019}. This succeeded beyond expectations, but is struggling to keep up with new data sources: DES, Rubin, Euclid, etc. Volunteer input is increasingly regarded as a finite and valuable resource, which needs to be used more efficiently \citep{2020IAUS..341...99D}.
 
 Sorting galaxies by color has been done for decades (blue spirals, red ellipticals), though this has been criticized as inaccurate \citep{smethurst_quantifying_2022}. Other approaches include radial brightness curves, looking for central bulges and bars. Attempts to use neural networks to classify morphology go back at least to a \href{https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge}{Kaggle challenge} in 2014, won by \citet{2015MNRAS.450.1441D}. The concept of transfer learning, using older surveys to train models for a newer one, was explored by \citet{2019MNRAS.484...93D} and later by \citet{walmsley_galaxy_2020} (hereafter W+20), discussed in more detail in \citet{2021MNRAS} (hereafter W+21). These all focus on visual images (or their equivalents redshifted to IR), but \citet{2021arXiv211104353F} discusses an exchange of techniques with radio astronomy. A broader review of ML in astronomy is given in \citet{2020WDMKD..10.1349F}.
 
@@ -149,7 +149,9 @@ Thus there are 10 possible questions (not all of which will be asked in each cas
 
 \subsection{ML model} \label{model}
 
-This evolved during the development of Zoobot. For W+20 and the mwalmsley/galaxy-zoo-bayesian-cnn repo, the architecture was a cut-down version of VGG16 \citep{2014arXiv1409.1556S}. For W+21 and mwalmsley/zoobot it had been updated to EfficientNet B0 \citep{2019arXiv190511946T}. The latter was used in the current work.
+This evolved during the development of Zoobot. For W+20 and the mwalmsley/galaxy-zoo-bayesian-cnn repo, the architecture was a cut-down version of VGG16 \citep{2014arXiv1409.1556S}. For W+21 and mwalmsley/zoobot it had been updated to EfficientNetB0 \citep{2019arXiv190511946T}. The latter was used in the current work.
+
+The model summary reported by Keras for DECaLS training is shown in Table \ref{tbl:tfmodel}. The first three layers are fairly standard image preprocessing steps (data augmentation). The EfficientNet component is all in the ``sequential 1'' layer, followed by pooling and dropout. The final dense layer gives a 34-component output, corresponding to the possible answers from the volunteers.
 
 \todo Details
 
@@ -255,7 +257,7 @@ As expected, this proved a slow step in the workflow and exposed the limitations
 	\gridline{\fig{gz2_train_64.pdf}{0.4\textwidth}{(a)}
 			  \fig{decals_train.pdf}{0.4\textwidth}{(b)}}
 	\gridline{\fig{gz2_train_32.pdf}{0.4\textwidth}{(c)}
-		      \fig{decals_train.pdf}{0.4\textwidth}{(d)}}
+		      \fig{decals_train_2.pdf}{0.4\textwidth}{(d)}}
 	\caption{Training runs for GZ2 (left) and DECaLS (right) \label{fig:train_plots}}
 \end{figure}
 

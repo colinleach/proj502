@@ -1,0 +1,20 @@
+# After editing, file should be saved as gzoo.yaml
+# Then keep it out of version control!
+
+dataroot: /path/to/zoobot_data  # Change as appropriate
+
+# gz2 data files
+mapping: gz2_catalog/zoo2MainSpecz_fields.txt
+datafile: gz2_catalog/zoo2MainSpecz.csv
+
+# DECaLS data files
+decals_csv: gz_decals_data/gz_decals_volunteers_5.csv
+decals_parquet: gz_decals_data/gz_decals_volunteers_5.parquet
+
+# folder for catalog files to make shards
+catalogs: pairs_catalogs
+
+# images folders (under dataroot)
+sdssdr7: gzimg/sdssdr7
+sdsspng: gzimg/sdsspng
+decalsdr5: gz_decals_dr5_png
