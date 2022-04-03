@@ -135,8 +135,8 @@ gzoo.yaml
 
 *.out
 
-training/results/
+projcode/training/results/
 
-data/Untitled.ipynb
+projcode/data/Untitled.ipynb
 
-project/unused/
+project_report/unused/
