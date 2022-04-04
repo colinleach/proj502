@@ -1,4 +1,4 @@
-# After editing, file should be saved as gzoo.yaml
+# After editing, file should be saved as ~/.gzoo.yaml
 # Then keep it out of version control!
 
 dataroot: /path/to/zoobot_data  # Change as appropriate

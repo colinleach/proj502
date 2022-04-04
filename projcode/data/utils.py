@@ -1,4 +1,6 @@
 import yaml
+from pathlib import Path
+from os import path
 
 
 def read_params():
@@ -8,7 +10,7 @@ def read_params():
     :return: parameter dictionary
     """
 
-    filename = '../gzoo.yaml'
+    filename = Path(path.expanduser("~")) / '.gzoo.yaml'
     with open(filename) as file:
         params = yaml.full_load(file)
         return params
