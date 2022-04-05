@@ -95,7 +95,7 @@ def gz2_shards(labelled_catalog_loc: str,
     ms.set_shard_type('gz2')
     ms.set_catalogs(labelled_catalog_loc=labelled_catalog_loc)
     ms.make_shards(shard_dir=shard_dir,
-                   img_size=256,
+                   img_size=300,
                    eval_size=10_000)
 
 def decals_shards(labelled_catalog_loc: str,
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     dataroot = Path(params['dataroot'])
     # gz2_partial_shards(str(dataroot / params['catalogs'] / 'gz2_partial_pairs.csv'),
     #                    str(dataroot / 'shards/gz2_partial'))
-    # gz2_shards(str(dataroot / params['catalogs'] / 'gz2_pairs.csv'),
-    #            str(dataroot / 'shards/gz2'))
-    decals_shards(str(dataroot / params['catalogs'] / 'decals_pairs.csv'),
-                  str(dataroot / 'shards/decals'))
+    gz2_shards(str(dataroot / params['catalogs'] / 'gz2_pairs.csv'),
+               str(dataroot / 'shards/gz2'))
+    # decals_shards(str(dataroot / params['catalogs'] / 'decals_pairs.csv'),
+    #               str(dataroot / 'shards/decals'))

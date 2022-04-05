@@ -182,5 +182,5 @@ class Catalog:
 if __name__ == '__main__':
     cat = Catalog()
     # cat.gz2_partial_catalog()
-    # cat.gz2_catalog()
-    cat.decals_catalog()
+    cat.gz2_catalog()
+    # cat.decals_catalog()

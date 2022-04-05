@@ -13,7 +13,7 @@ from zoobot.tensorflow.training import training_config, losses
 from zoobot.tensorflow.estimators import preprocess, define_model
 from zoobot.shared import schemas, label_metadata
 
-from data.utils import read_params
+from projcode.data.utils import read_params
 
 class TrainModel:
 
@@ -190,7 +190,7 @@ def train_gz2(params: dict, batch_size: int = 128, epochs: int = 100):
     tm.set_schema('gz2')
     tm.set_channels()
     tm.set_context_manager()
-    tm.train(initial_size=256,
+    tm.train(initial_size=300,
              resize_size=128,
              batch_size=batch_size, # tried 128, ran out of memory locally
              epochs=epochs)
@@ -210,5 +210,6 @@ def train_decals(params: dict, batch_size: int = 128, epochs: int = 100):
 
 
 if __name__ == '__main__':
+    # print(tf.__version__)
     params = read_params()
-    train_decals(params, batch_size=32, epochs=100)
+    train_gz2(params, batch_size=64, epochs=2)

@@ -5,7 +5,7 @@ import sys
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from astropy.io import fits
 from tqdm import tqdm
 # import sklearn
@@ -134,8 +134,10 @@ def load_png_as_pil(subject: pd.Series):
     # except KeyError:
     loc = subject['file_loc']
     assert loc[-4:] == '.png'
-    return Image.open(loc)
-
+    try:
+        return Image.open(loc)
+    except UnidentifiedImageError:
+        logging.error(f"Image error with {loc}")
 
 def load_jpeg_as_pil(subject: pd.Series):
     """

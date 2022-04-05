@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras import layers
+# from tensorflow.keras import layers
 
 
 # this would be more elegant, but sadly using a stack with multiple sequential models 
@@ -14,7 +14,7 @@ from tensorflow.keras import layers
 #         return x
 
 
-class PermaDropout(layers.Dropout):
+class PermaDropout(tf.keras.layers.Dropout):
     def call(self, x, training=None):
         return super().call(x, training=True)  # ME, force dropout on at test time
 

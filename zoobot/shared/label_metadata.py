@@ -184,8 +184,9 @@ def get_gz2_and_decals_dependencies(question_answer_pairs):
         'edge-on-bulge': 'disk-edge-on_yes',
         'spiral-winding': 'has-spiral-arms_yes',
         'spiral-arm-count': 'has-spiral-arms_yes', # bad naming...
+        'spiral-count': 'has-spiral-arms_yes', # bad naming...
         'merging': None,
-        # 'something-odd': None,  # always asked
+        'something-odd': None,  # always asked
         # and the dr12 pairs (it's okay to include these in the dict, they'll simply be ignored if not keyed)
         'bar-dr12': featured_branch_answer,
         'bulge-size-dr12': featured_branch_answer,
