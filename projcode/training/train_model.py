@@ -172,7 +172,7 @@ class TrainModel:
 def train_gz2_partial(params: dict):
     dataroot = Path(params['dataroot'])
     tm = TrainModel()
-    tm.set_paths(shards_dir=str(dataroot / 'shards/gz2_partial'),
+    tm.set_paths(shards_dir=dataroot / 'shards/gz2_partial',
                  save_dir='results/gz2_partial')
     tm.set_schema('gz2_partial')
     tm.set_channels()
@@ -186,12 +186,12 @@ def train_gz2(params: dict, batch_size: int = 128, epochs: int = 100):
     dataroot = Path(params['dataroot'])
     tm = TrainModel()
     tm.set_paths(shards_dir=dataroot / 'shards/gz2',
-                 save_dir=f'results/gz2/{datetime.now().strftime("%Y%m%d-%H%M%S")}')
+                 save_dir=str(dataroot / f'results/gz2/{datetime.now().strftime("%Y%m%d-%H%M%S")}'))
     tm.set_schema('gz2')
     tm.set_channels()
     tm.set_context_manager()
     tm.train(initial_size=300,
-             resize_size=128,
+             resize_size=224,
              batch_size=batch_size, # tried 128, ran out of memory locally
              epochs=epochs)
 
@@ -212,4 +212,4 @@ def train_decals(params: dict, batch_size: int = 128, epochs: int = 100):
 if __name__ == '__main__':
     # print(tf.__version__)
     params = read_params()
-    train_gz2(params, batch_size=64, epochs=2)
+    train_gz2(params, batch_size=32, epochs=2)

@@ -7,7 +7,7 @@ scipy
 scikit-image
 scikit-learn
 matplotlib
-python-dateutil==2.8.1  # for boto3
+# python-dateutil==2.8.1  # for boto3
 boto3
 statsmodels
 keras_applications  # for efficientnet
@@ -16,7 +16,7 @@ pyarrow
 seaborn  # for nice plots
 astropy  # for reading .fits (not yet implemented, but likely to be added)
 
-# psycopg2 # use conda install if you want this
+# psycopg2
 pyyaml
 requests
 sqlalchemy
