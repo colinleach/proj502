@@ -182,11 +182,14 @@ def train_gz2_partial(params: dict):
              batch_size=8,
              epochs=2)
 
-def train_gz2(params: dict, batch_size: int = 128, epochs: int = 100):
+def train_gz2(params: dict, batch_size: int = 128, epochs: int = 100, save_dir=None):
     dataroot = Path(params['dataroot'])
     tm = TrainModel()
-    tm.set_paths(shards_dir=dataroot / 'shards/gz2',
-                 save_dir=str(dataroot / f'results/gz2/{datetime.now().strftime("%Y%m%d-%H%M%S")}'))
+    shards_dir =dataroot / 'shards/gz2'
+    if save_dir is None:
+        save_dir = f'results/gz2/{datetime.now().strftime("%Y%m%d-%H%M%S")}'
+    tm.set_paths(shards_dir=shards_dir,
+                 save_dir=save_dir)
     tm.set_schema('gz2')
     tm.set_channels()
     tm.set_context_manager()
@@ -195,11 +198,14 @@ def train_gz2(params: dict, batch_size: int = 128, epochs: int = 100):
              batch_size=batch_size, # tried 128, ran out of memory locally
              epochs=epochs)
 
-def train_decals(params: dict, batch_size: int = 128, epochs: int = 100):
+def train_decals(params: dict, batch_size: int = 128, epochs: int = 100, save_dir=None):
     dataroot = Path(params['dataroot'])
     tm = TrainModel()
-    tm.set_paths(shards_dir=dataroot / 'shards/decals',
-                 save_dir=f'results/decals/{datetime.now().strftime("%Y%m%d-%H%M%S")}')
+    shards_dir =dataroot / 'shards/decals'
+    if save_dir is None:
+        save_dir = f'results/decals/{datetime.now().strftime("%Y%m%d-%H%M%S")}'
+    tm.set_paths(shards_dir=shards_dir,
+                 save_dir=save_dir)
     tm.set_schema('decals')
     tm.set_channels()
     tm.set_context_manager()
