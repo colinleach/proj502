@@ -2,7 +2,7 @@
 %\documentclass[twocolumn, tighten]{aastex63}
 %\documentclass[twocolumn, twocolappendix, tighten]{aastex631}
 %\documentclass[twocolumn, twocolappendix, tighten]{aastex631}
-\documentclass[preprint]{aastex63}
+\documentclass[preprint]{aastex631}
 
 %\newcommand{\vdag}{(v)^\dagger}
 %\newcommand\aastex{AAS\TeX}
@@ -128,6 +128,7 @@ Galaxy Zoo catalogs are not just a simple classification, such as elliptical vs 
 
 In the Python code this is represented by two dictionaries: for questions/answers and for dependencies. The Q\&A version is shown below: keys are questions, values are lists of allowed answers (as a suffix which will be appended to the question). The dependency dictionary lists previous questions that would allow the current question to be reached.
 
+\newpage
 \begin{lstlisting}[language=Python]
 decals_pairs = {
 	'smooth-or-featured': ['_smooth', '_featured-or-disk', '_artifact'],
