@@ -14,19 +14,26 @@ from zoobot.tensorflow.estimators import define_model, preprocess
 from zoobot.tensorflow.predictions import predict_on_tfrecords, predict_on_dataset
 from data.utils import read_params
 
+
 class MakePredictions:
     """
 
     """
 
-    def __init__(self, file_format: str = 'png'):
+    def __init__(self, params: Path, file_format: str = 'png', initial_size: int = 300):
         self.file_format = file_format
-        self.initial_size = None
+        self.initial_size = initial_size
         self.crop_size = None
         self.resize_size = None
-        self.channels
+        self.channels = None
 
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+        logfile = Path(params['dataroot']) / 'logfiles/predictions.log'
+        logging.basicConfig(
+            filename=logfile,
+            format='%(asctime)s %(levelname)s: %(message)s',
+            level=logging.INFO
+        )
+        logging.info("----------------------------")
 
         # useful to avoid errors on small GPU
         gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -47,7 +54,7 @@ class MakePredictions:
 
     def images_from_catalog(self, df: pd.DataFrame):
         ## or maybe you already have a list from a catalog?
-        unordered_image_paths = df['paths']
+        unordered_image_paths = df['file_loc']
         self.paths_to_dataset(unordered_image_paths)
 
     def paths_to_dataset(self,
@@ -96,7 +103,7 @@ class MakePredictions:
         self.resize_size = resize_size  # 224 for paper
         self.channels = channels
 
-    def predict_pretrained(self, checkpoint_loc):
+    def predict_pretrained(self, checkpoint_loc, save_loc):
         """
         If you're just using the full pretrained Galaxy Zoo model, without finetuning,
         you can just use include_top=True.
@@ -113,7 +120,7 @@ class MakePredictions:
 
         label_cols = label_metadata.decals_label_cols
 
-        save_loc = 'data/results/make_predictions_example.hdf5'
+        # save_loc = 'data/results/make_predictions_example.hdf5'
         n_samples = 5
         predict_on_dataset.predict(self.image_ds, model, n_samples, label_cols, save_loc)
 
@@ -157,11 +164,43 @@ class MakePredictions:
         predict_on_dataset.predict(self.image_ds, model, n_samples, label_cols, save_loc)
 
 
-def decals():
-    mp = MakePredictions()
+def gz2_catalog():
     params = read_params()
-    dataset = Path(params['dataroot']) / params['']
-    mp.set_existing_dataset(Path)
+    mp = MakePredictions(params)
+    dataroot = Path(params['dataroot'])
+    datadir = dataroot / 'shards/gz2/test_shards'
+    df = pd.read_csv(datadir / 'test_df.csv')
+    id_loc = df[['id_str', 'file_loc']].copy()
+    checkpoint_loc = dataroot / 'results/best_training/gz2/checkpoint'
+    save_loc = dataroot / 'results/predictions/gz2.hdf5'
+    mp.images_from_catalog(id_loc)
+    mp.model_params()
+    mp.predict_pretrained(checkpoint_loc, str(save_loc))
+
+def decals_catalog():
+    params = read_params()
+    mp = MakePredictions(params)
+    dataroot = Path(params['dataroot'])
+    datadir = dataroot / 'shards/decals/test_shards'
+    df = pd.read_csv(datadir / 'test_df.csv')
+    id_loc = df[['id_str', 'file_loc']].copy()
+    checkpoint_loc = dataroot / 'results/best_training/decals/checkpoint'
+    save_loc = dataroot / 'results/predictions/decals.hdf5'
+    mp.images_from_catalog(id_loc)
+    mp.model_params()
+    mp.predict_pretrained(checkpoint_loc, str(save_loc))
+
+# def decals_shards():
+#     mp = MakePredictions()
+#     params = read_params()
+#     dataroot = Path(params['dataroot'])
+#     datadir = dataroot / 'shards/decals/test_shards'
+#     shards = list(datadir.glob('*.tfrecord'))
+#     mp.set_existing_dataset(tf.data.TFRecordDataset(shards[0]))
+#     mp.model_params()
+#     checkpoint_loc = dataroot / 'results/decals/checkpoint'
+#     save_loc = dataroot / 'results/make_predictions_example.hdf5'
+#     mp.predict_pretrained(checkpoint_loc, save_loc)
 
 if __name__ == '__main__':
-    pass
+    gz2_catalog()

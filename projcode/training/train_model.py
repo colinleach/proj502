@@ -17,10 +17,11 @@ from projcode.data.utils import read_params
 
 class TrainModel:
 
-    def __init__(self):
+    def __init__(self, params: Path):
 
+        logfile = Path(params['dataroot']) / 'logfiles/training.log'
         logging.basicConfig(
-            filename='training.log',
+            filename=logfile,
             format='%(asctime)s %(levelname)s:%(message)s',
             level=logging.INFO
         )
@@ -86,7 +87,8 @@ class TrainModel:
             # Not tested - you'll need to set this up for your own cluster.
             self.context_manager = strategy.scope()
             logging.info('Replicas: {}'.format(strategy.num_replicas_in_sync))
-        else:
+        else:    params = read_params()
+
             logging.info('Using single GPU, not distributed')
             self.context_manager = contextlib.nullcontext()  # does nothing, just a convenience for clean code
 
@@ -218,4 +220,4 @@ def train_decals(params: dict, batch_size: int = 128, epochs: int = 100, save_di
 if __name__ == '__main__':
     # print(tf.__version__)
     params = read_params()
-    train_gz2(params, batch_size=32, epochs=2)
+    train_gz2(params, batch_size=32, epochs=50)

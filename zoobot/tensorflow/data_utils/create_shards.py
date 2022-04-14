@@ -3,6 +3,9 @@ Save catalog columns and images to tfrecord shards.
 Allowed to assume:
 - Each catalog entry has an image under `file_loc`. Must be .png file (easy to extend to others if you need, submit a PR)
 - Each catalog entry has an identifier under `id_str`
+
+For a full working example, see `zoobot/tensorflow/examples/decals_dr5_to_shards.py`
+
 """
 
 import os
@@ -121,7 +124,7 @@ class ShardConfig():
         if unlabelled_catalog is not None:
             checks.check_no_missing_files(unlabelled_catalog['file_loc'], max_to_check=2000)
 
-        logging.info('\nLabelled subjects: {}'.format(len(labelled_catalog)))
+        logging.info('Labelled subjects: {}'.format(len(labelled_catalog)))
         labelled_catalog.to_csv(self.labelled_catalog_loc)
 
         if unlabelled_catalog is not None:
@@ -132,7 +135,7 @@ class ShardConfig():
         train_df, hidden_df = train_test_split(labelled_catalog, test_size=val_fraction + test_fraction)  # sklearn understands test size float as a fraction
         val_df, test_df = train_test_split(hidden_df, test_size=test_fraction / (val_fraction + test_fraction))  # both fractions of full catalog, now taking a slice of a slice
 
-        logging.info('\nTraining subjects: {}'.format(len(train_df)))
+        logging.info('Training subjects: {}'.format(len(train_df)))
         logging.info('Val subjects: {}'.format(len(val_df)))
         logging.info('Test subjects: {}'.format(len(test_df)))
         if len(train_df) < len(val_df):
@@ -176,7 +179,7 @@ class ShardConfig():
         assert os.path.isdir(self.val_dir)
         assert os.path.isdir(self.test_dir)
         assert os.path.isfile(self.labelled_catalog_loc)
-        if self.unlabelled_catalog_loc is '':
+        if self.unlabelled_catalog_loc == '':
             logging.info('No unlabelled_catalog has been used')
         else:
             assert os.path.isfile(self.unlabelled_catalog_loc)
