@@ -1,5 +1,5 @@
 import tensorflow as tf
-# from tensorflow.keras import layers
+from tensorflow.keras import layers
 
 
 # this would be more elegant, but sadly using a stack with multiple sequential models 
@@ -14,7 +14,7 @@ import tensorflow as tf
 #         return x
 
 
-class PermaDropout(tf.keras.layers.Dropout):
+class PermaDropout(layers.Dropout):
     def call(self, x, training=None):
         return super().call(x, training=True)  # ME, force dropout on at test time
 
@@ -22,14 +22,14 @@ class PermaDropout(tf.keras.layers.Dropout):
 #     def call(self, x, training=None):
 #         return super().call(x, training=True)
 
-class PermaRandomRotation(tf.keras.layers.experimental.preprocessing.RandomRotation):
+class PermaRandomRotation(tf.keras.layers.RandomRotation):
     def call(self, x, training=None):
         return super().call(x, training=True)
 
-class PermaRandomFlip(tf.keras.layers.experimental.preprocessing.RandomFlip):
+class PermaRandomFlip(tf.keras.layers.RandomFlip):
     def call(self, x, training=None):
         return super().call(x, training=True)
 
-class PermaRandomCrop(tf.keras.layers.experimental.preprocessing.RandomCrop):
+class PermaRandomCrop(tf.keras.layers.RandomCrop):
     def call(self, x, training=None):
         return super().call(x, training=True)
