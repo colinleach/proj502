@@ -28,6 +28,7 @@ class MakePredictions:
         self.channels = None
 
         logfile = Path(params['dataroot']) / 'logfiles/predictions.log'
+        print(f"Logging to {logfile}")
         logging.basicConfig(
             filename=logfile,
             format='%(asctime)s %(levelname)s: %(message)s',
@@ -109,6 +110,7 @@ class MakePredictions:
         you can just use include_top=True.
         """
 
+        print(f"Model: {checkpoint_loc}\nOutputting results to {save_loc}")
         model = define_model.load_model(
             checkpoint_loc=checkpoint_loc,
             include_top=True,
@@ -164,8 +166,9 @@ class MakePredictions:
         predict_on_dataset.predict(self.image_ds, model, n_samples, label_cols, save_loc)
 
 
-def gz2_catalog():
-    params = read_params()
+def gz2_catalog(params: dict = None):
+    if params is None:
+        params = read_params()
     mp = MakePredictions(params)
     dataroot = Path(params['dataroot'])
     datadir = dataroot / 'shards/gz2/test_shards'
@@ -177,15 +180,17 @@ def gz2_catalog():
     mp.model_params()
     mp.predict_pretrained(checkpoint_loc, str(save_loc))
 
-def decals_catalog():
-    params = read_params()
+def decals_catalog(params: dict = None, save_loc: Path = None):
+    if params is None:
+        params = read_params()
     mp = MakePredictions(params)
     dataroot = Path(params['dataroot'])
     datadir = dataroot / 'shards/decals/test_shards'
     df = pd.read_csv(datadir / 'test_df.csv')
     id_loc = df[['id_str', 'file_loc']].copy()
     checkpoint_loc = dataroot / 'results/best_training/decals/checkpoint'
-    save_loc = dataroot / 'results/predictions/decals.hdf5'
+    if save_loc is None:
+        save_loc = dataroot / 'results/predictions/decals.hdf5'
     mp.images_from_catalog(id_loc)
     mp.model_params()
     mp.predict_pretrained(checkpoint_loc, str(save_loc))
