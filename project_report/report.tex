@@ -95,9 +95,11 @@ Python code and documentation associated with ASTR 502 is available on Github\fo
 
 W+20 reports that GZ2 training was carried out on a p2.xlarge EC2 instance with K80 GPU, taking about 8 hours. For DECaLS, the GPU was upgraded to a V100.
 
-Experiments with the GPUs available at the start of this project rapidly proved that 2GB of GPU memory is wholly inadequate for training a CNN. Upgrading to a 6GB GTX 1660 (far from state of the art, but only \$450 and compatible with the existing motherboard and PSU) allowed some progress. However, this still proved limiting for batch size as discussed below.
+Experiments with the GPUs available to me at the start of this project rapidly proved that 2GB of GPU memory is wholly inadequate for training a CNN. Upgrading to a 6GB GTX 1660 (far from state of the art, but affordable and compatible with the existing motherboard and PSU) allowed some progress. This still proved limiting for batch size as discussed below, but was useful for debugging before moving to Colab. Making predictions from a pre-trained model was less demanding and worked well on local hardware.
 
-\todo Colab and AWS
+For training runs, the free tier of Colab had few advantages. Reaching the target batch size of 128 used a 16GB V100 GPU for long periods (>12h), with Colab upgraded to the Pro and later Pro+ tiers.
+
+Only one attempt was made to use a Colab TPU, unsuccessfully. Getting this working will require copying large files to the TPU before each run; unlike a GPU, this cannot be linked to Google Drive storage.
 
 
 \section{Goals} \label{sec:goals}
@@ -144,13 +146,12 @@ decals_pairs = {
 }
 \end{lstlisting}
 
-Thus there are 10 possible questions (not all of which will be asked in each case), and 34 possible answers. Each answer has its own field in the input to the model (in addition to an identifier and the image), and the training output includes a weighting for each. The prediction step then takes a new galaxy and produces a probability for each of the possible answers.
-
-\todo Dirichlet?
+Thus there are 10 possible questions (not all of which will be asked in each case), and 34 possible answers. Each answer has its own field in the input to the model (in addition to an identifier and the image), and the training output includes a weighting for each. The prediction step then takes a new galaxy and, in principle, produces a probability for each of the possible answers. This is discussed in more detail in section ????.
+\todo link
 
 \subsection{ML model} \label{model}
 
-This evolved during the development of Zoobot. For W+20 and the mwalmsley/galaxy-zoo-bayesian-cnn repo, the architecture was a cut-down version of VGG16 \citep{2014arXiv1409.1556S}. For W+21 and mwalmsley/zoobot it had been updated to EfficientNetB0 \citep{2019arXiv190511946T}. The latter was used in the current work.
+This evolved during the development of Zoobot. For W+20 and the mwalmsley/galaxy-zoo-bayesian-cnn repo, the architecture was a cut-down version of VGG16 \citep{2014arXiv1409.1556S}. For W+21 and mwalmsley/zoobot it had been updated to EfficientNet-B0 \citep{2019arXiv190511946T}. The latter was used in the current work.
 
 The model summary reported by Keras for DECaLS training is shown in Table \ref{tbl:tfmodel}. The first three layers are fairly standard image preprocessing steps (data augmentation). The EfficientNet component is all in the ``sequential 1'' layer, followed by pooling and dropout. The final dense layer gives a 34-component output, corresponding to the possible answers from the volunteers.
 
@@ -174,6 +175,8 @@ The model summary reported by Keras for DECaLS training is shown in Table \ref{t
 	\enddata
 \end{deluxetable} \vspace{-10mm}
 
+\todo EfficientNet plan
+
 
 \subsection{Loss Function}
 
@@ -193,7 +196,9 @@ The parameters are now vectors with one element per answer.
 
 \subsection{Output}
 
-\todo
+Results are saved in a Tensorflow binary format, suitable for use as a starting point for making predictions. They are also used by TensorBoard utility to make training plots as in Figure ?? \todo link
+
+
 \section{Workflow}
 
 In outline, these are the steps required:
@@ -249,9 +254,9 @@ Before training, input data needs to be converted to a tfrecord format that Tens
 
 For debugging, a much smaller GZ2 shard set was also created, with fewer records and low-resolution images. This proved valuable in quickly finding some minor bugs in the current Zoobot repo: apparently it was tested mainly with DECaLS data and there are some typos and omissions in the GZ2 code. Accordingly, from this point the project uses my fork of the mwalmsley/zoobot repo. A PR with the corrections will be submitted upstream once everything is working correctly.
 
-\subsection{Training}
+\subsection{Training Locally}
 
-As expected, this proved a slow step in the workflow and exposed the limitations of the local (6 GB) GPU. A batch size of 128 was used in the published work. For GZ2, this caused an immediate GPU out-of-memory error. Dropping to batches of 64 was more successful, as in Figure \ref{fig:train_plots}(a), though this used most of the available GPU memory. Progressing at about 10 min/epoch, the training loss drops smoothly and reached stopping criteria (\todo) after 54 epochs, 8.3 hours. However, the evaluation loss (??) is noisy and suggests rather poor generalization.
+As expected, this proved a slow step in the workflow and exposed the limitations of the local (6 GB) GPU. A batch size of 128 was used in the published work. For GZ2, this caused an immediate GPU out-of-memory error. Dropping to batches of 64 was more successful, as in Figure \ref{fig:train_plots}(a), though this used most of the available GPU memory. Progressing at about 10 min/epoch, the training loss drops smoothly and reached stopping criteria (10 epochs without improvement) after 54 epochs, 8.3 hours. However, the evaluation loss (\todo ??) is noisy and suggests rather poor generalization.
 
 
 \begin{figure}
@@ -263,17 +268,20 @@ As expected, this proved a slow step in the workflow and exposed the limitations
 \end{figure}
 
 
-For DECaLS, the batch size needed to be reduced to 32 to fit in GPU memory. Training is slower (about 30 min/epoch) but the results are more encouraging, as shown in Figure \ref{fig:train_plots}(b). After some initial spikes, the evaluation loss tracks closely with the training loss. This run failed to reach stopping criteria within the epoch limit (40 epochs, nearly 19 hours) but looks good enough to progress with.
+For DECaLS, the batch size needed to be reduced to 32 to fit in GPU memory. Training is slower (about 30 min/epoch) but the results are more encouraging, as shown in Figure \ref{fig:train_plots}(b). After some initial spikes, the evaluation loss tracks closely with the training loss. This run failed to reach stopping criteria within the epoch limit (40 epochs, nearly 19 hours). A longer second run, shown in Figure \ref{fig:train_plots}(d), terminated successfully. Differences between the two runs mainly illustrate the stochastic variation in this method.
 
 It is not immediately clear why the DECaLS run looks better than the GZ2 run. Preparation of data shards uses the same code and no error has yet been found. Other hypotheses include the different batch size and different image size and quality. Batch size is easiest to test, so GZ2 training was repeated with batches of 32 as in Figure \ref{fig:train_plots}(c). This is not encouraging: training now looks worse without evaluation looking better.
 
 Images obtained from DECaLS are inherently higher resolution and deeper than those from SDSS used in GZ2 (bigger telescope, newer camera). Training was also carried out on differently sized images: $300 \times 300$ for DECaLS and $256 \times256$ for GZ2.
 
-There are also significant differences in image preparation. W+20 gives little detail about this for GZ2, so the simple method described in section \ref{images} was followed.  In contrast, W+21 describes a more complex process, starting from FITS data files at native telescope resolution. Something equivalent may be possible for SDSS, but as this is not an urgent priority for an ASTR 502 term paper it may be better to focus on the DECaLS survey.
-
 The respective catalogs share no common ID field, but a match on RA/Dec coordinates identified 132,722 images which are in both data sets. A few representative examples are shown in Figure \ref{fig:images}. Clearly there is a major difference in quality.
 
-\todo Repeat with GZ2 images zoomed in
+By default, the SDSS cutout service supplies images at a scale of 0.4 arcsec/pixel. As a first attempt to do better, new images were downloaded at 0.1 arcsec/pixel, with the SDSS server handling any necessary pixel interpolation.
+
+\todo show examples
+
+There are also significant differences in image preparation. W+20 gives little detail about this for GZ2, so the simple method described in section \ref{images} was followed.  In contrast, W+21 describes a more complex process, starting from FITS data files at native telescope resolution. Something equivalent may be possible for SDSS, but as this is not an urgent priority for an ASTR 502 term paper it may be better to focus on the DECaLS survey.
+
 
 \begin{figure}
 	\gridline{\fig{J110001.05+010644.0.pdf}{0.6\textwidth}{(a)}}
@@ -281,10 +289,36 @@ The respective catalogs share no common ID field, but a match on RA/Dec coordina
 	\caption{Raw images used for GZ2 (left) and DECaLS (right) \label{fig:images}}
 \end{figure}
 
+\subsection{Training on Colab}
+
+All relevant files were copied to Google Drive, from where they could be mounted in a Colab notebook. Training was run with batch size 128 on a Tesla V100 GPU, using around 95\% of the 16GB memory. At around 15 min/epoch, both GZ2 and DECaLS took approximately 12 h to converge. Results, shown in Figure \ref{fig:train_colab}, are broadly similar to those obtained locally.
+
+\begin{figure}
+	\gridline{\fig{gz2_train_128.pdf}{0.4\textwidth}{}
+			\fig{decals_train_bs128.pdf}{0.4\textwidth}{}}
+	\caption{Colab training runs for GZ2 (left) and DECaLS (right) \label{fig:train_colab}}
+\end{figure}
+
 
 \section{Predictions}
 
-\todo
+When preparing shards as in Section ??, the input catalog was divided into train, validate and test sets, then each was encoded as binary tfrecord shards including the graphical image. This helped speed training but is largely pointless for predictions on the test set. Instead, this step used a CSV (or alternatively feather) file as input which included full paths to the relevant images.
+
+For DECaLS, the test set contains around 43k galaxies. Using the model pretrained on Colab in the previous step, predictions were generated for all of these in around 11 min. Output was to an HDF5 file; CSV is also possible but less convenient.
+
+The raw output proved surprising. For each galaxy, in addition to a full path to the image the documentation implied there would be an array of 34 probabilities, corresponding the set of possible Q\&A pairs in the GZ survey. Instead, there was a $34 \times 5$ array. From W+21, it appears that the final dropout step of the model (Figure \todo ??) runs multiple times and an output is stored for each of them, giving an assessment of reproducibility. In practice, the five values generally had a small standard deviation, so all further analysis used the mean.
+
+
+
+\section{PyTorch Code}
+
+\todo add 
+
+\section{Transfer Learning}
+
+\todo add 
+
+
 
 \bibliography{GZML}{}
 \bibliographystyle{aasjournal}
