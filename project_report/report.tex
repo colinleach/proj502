@@ -97,7 +97,7 @@ W+20 reports that GZ2 training was carried out on a p2.xlarge EC2 instance with 
 
 Experiments with the GPUs available to me at the start of this project rapidly proved that 2GB of GPU memory is wholly inadequate for training a CNN. Upgrading to a 6GB GTX 1660 (far from state of the art, but affordable and compatible with the existing motherboard and PSU) allowed some progress. This still proved limiting for batch size as discussed below, but was useful for debugging before moving to Colab. Making predictions from a pre-trained model was less demanding and worked well on local hardware.
 
-For training runs, the free tier of Colab had few advantages. Reaching the target batch size of 128 used a 16GB V100 GPU for long periods (>12h), with Colab upgraded to the Pro and later Pro+ tiers.
+For training runs, the free tier of Colab had few advantages. Reaching the target batch size of 128 used a 16GB V100 GPU for long periods ($>12$h), with Colab upgraded to the Pro and later Pro+ tiers.
 
 Only one attempt was made to use a Colab TPU, unsuccessfully. Getting this working will require copying large files to the TPU before each run; unlike a GPU, this cannot be linked to Google Drive storage.
 
@@ -130,7 +130,7 @@ Galaxy Zoo catalogs are not just a simple classification, such as elliptical vs 
 
 In the Python code this is represented by two dictionaries: for questions/answers and for dependencies. The Q\&A version is shown below: keys are questions, values are lists of allowed answers (as a suffix which will be appended to the question). The dependency dictionary lists previous questions that would allow the current question to be reached.
 
-\newpage
+
 \begin{lstlisting}[language=Python]
 decals_pairs = {
 	'smooth-or-featured': ['_smooth', '_featured-or-disk', '_artifact'],
@@ -248,7 +248,7 @@ Having everything in PostgreSQL makes it easy to join the data and image tables 
 
 Zoobot requires the columns to have the correct names and appear in the correct order. A galaxy identifier is in 'id\_str' and a full path to the PNG is in 'file\_loc', then the remaining columns contain total votes cast for each answer in the GZ decision tree.
 
-\subsection{Tensor shards}
+\subsection{Tensor shards} \label{shards}
 
 Before training, input data needs to be converted to a tfrecord format that TensorFlow can read quickly. The combined catalog is split into train, evaluate and test sets; for this project a 7:2:1 ratio was used. For each set, image files are read and undergo initial cropping and resizing before combining with the GZ votes and written to binary tfrecord files. This took around 1 hour per survey (i9 processor, local SSD storage) and the output files total about 100 GB.
 
@@ -302,19 +302,19 @@ All relevant files were copied to Google Drive, from where they could be mounted
 
 \section{Predictions}
 
-When preparing shards as in Section \todo ??, the input catalog was divided into train, validate and test sets, then each was encoded as binary tfrecord shards including the graphical image. This helped speed training but is largely pointless for predictions on the test set. Instead, this step used a CSV (or alternatively feather) file as input which included full paths to the relevant images.
+When preparing shards as in Section \ref{shards}, the input catalog was divided into train, validate and test sets, then each was encoded as binary tfrecord shards including the graphical image. This helped speed training but is largely pointless for predictions on the test set. Instead, this step used a CSV (or alternatively feather) file as input which included full paths to the relevant images.
 
 For DECaLS, the test set contains around 43k galaxies. Using the model pretrained on Colab in the previous step, predictions were generated for all of these in around 11 min. Output was to an HDF5 file; CSV is also possible but less convenient.
 
-The raw output proved surprising. For each galaxy, in addition to a full path to the image the documentation implied there would be an array of 34 probabilities, corresponding the set of possible Q\&A pairs in the GZ survey. Instead, there was a $34 \times 5$ array. From W+21, it appears that the final dropout step of the model (Figure \todo ??) runs multiple times and an output is stored for each of them, giving an assessment of reproducibility. In practice, the five values generally had a small standard deviation, so all further analysis used the mean.
+The raw output proved surprising. For each galaxy, in addition to a full path to the image the documentation implied there would be an array of 34 probabilities, corresponding the set of possible Q\&A pairs in the GZ survey. Instead, there was a $34 \times 5$ array. From W+21, it appears that the final dropout step of the model (Figure \ref{model}) runs multiple times and an output is stored for each of them, giving an assessment of reproducibility. In practice, the five values generally had a small standard deviation, so all further analyses used the mean.
 
 It is also somewhat unclear what the numbers represent. Probabilities were expected, with the options for each question adding up to 1, or to 100\%. Instead the sum is highly variable and the distribution centers around roughly 70. Taking a view that the relative values are most important, everything was simply normalized to sum to 1 for clarity. 
 
-\subsection{Reviewing predictions}
+\subsection{Reviewing predictions: single galaxy}
 
 To get a first feel for the results, a galaxy was chosen at random (only ensuring that it was one with a reasonably clear image). The prediction output is shown in Table \ref{tbl:single_pred}. Answers with at least an 80\% confidence are bolded. In all cases these agree with the consensus of the GZ volunteers, as does ``spiral-winding''.
 
-Of the other questions, the volunteers by small majorities favored no bar and small bulge, the second choices of the predictor. The remaining two show the limitations of this crude analysis: ``how-rounded'' is not relevant to disks and ``edge-on-bulge'' is only relevant if the disk is edge on. Most volunteers would therefore have bypassed these questions.   
+Of the other questions, the volunteers by small majorities favored no bar and small bulge, the second choices of the predictor. The remaining two show the limitations of this crude analysis: ``how-rounded'' is not relevant to disks and ``edge-on-bulge'' is only relevant if the disk is edge on. Most volunteers would therefore have bypassed these questions, as shown in the decision tree of Figure \ref{fig:decals_decisions}.   
 
 \begin{deluxetable}{ll}[htb!]
 	\tablecaption{Predictions for a single random galaxy, in descending order of probability
@@ -337,8 +337,49 @@ Of the other questions, the volunteers by small majorities favored no bar and sm
 	\enddata
 \end{deluxetable} \vspace{-10mm}
 
-\todo review across galaxies
 
+\subsection{Reviewing predictions: all galaxies}
+
+Given the complexities of inter-dependent questions, a simple starting point would be to focus on question 1, ``smooth-or-featured'', which all volunteers have to answer. An astronomer might prefer ``elliptical or disk'', but the chosen wording works for a wider public\footnote{Award-winning postdoc and podcaster Dr Becky Smethurst, a co-author on several of these papers, likes the name ``boring blobby things'' for ellipticals. It remains to been seen whether this will help her get a faculty position.}. Table \ref{tbl:smoothdisk} shows the confusion matrix, with agreement between volunteers and the model for 88\% of the images.
+
+\begin{deluxetable}{lccc}[htb!]
+	\tablecaption{Confusion matrix for ``smooth or featured''.
+		\label{tbl:smoothdisk}}
+	\tablewidth{0pt}
+	\tablehead{
+		 & \colhead{smooth} & \colhead{featured-or-disk} & \colhead{artifact}
+	}
+	\startdata
+		smooth & \textbf{27411} & 2183 & 159\\
+		featured-or-disk & 2365 & \textbf{10356} & 95\\
+		artifact & 329 & 54 & \textbf{321}
+	\enddata
+\end{deluxetable} \vspace{-5mm}
+
+Similarly, all volunteers are asked about possible mergers, with the results in Table \ref{tbl:merger}. In this case there is 87\% agreement. Off-diagonal values are asymmetric, with the model tending to favor some disturbance when volunteers prefer none. Note that this only uses the top-ranking choice and ignores confidence levels.
+
+\begin{deluxetable}{lcccc}[htb!]
+	\tablecaption{Confusion matrix for ``merging''.
+		\label{tbl:merger}}
+	\tablewidth{0pt}
+	\tablehead{
+		& \colhead{none} & \colhead{minor-disturbance} & \colhead{major-disturbance} & \colhead{merger}
+	}
+	\startdata
+	none & \textbf{36093} & 133 & 230 & 785\\
+	minor-disturbance & 2145 & \textbf{159} & 123 & 159\\
+	major-disturbance & 441 & 31 & \textbf{287} &  155 \\
+	merger & 1327 & 14 & 39 & \textbf{1152}
+	\enddata
+\end{deluxetable} \vspace{-10mm}
+
+\subsection{Using predictions: find top-scoring galaxies}
+
+Where the prediction is uncertain between two choices, such as with 0.48 versus 0.45 probabilities, this may be a failure of the model. Perhaps more likely, it reflects genuine ambiguity in the image and a need for humans to take a closer look. Triaging images to use humans more efficiently was, of course, an original aim of this research. Also, there is some data to show that volunteers are often divided about the same ambiguous images \todo ref
+
+An alternative approach may better use the strengths of the model: identify the top-$N$ galaxies confidently predicted to have a particular feature.
+
+\todo find mergers, bars
 
 \section{PyTorch Code}
 
