@@ -87,8 +87,8 @@ class TrainModel:
             # Not tested - you'll need to set this up for your own cluster.
             self.context_manager = strategy.scope()
             logging.info('Replicas: {}'.format(strategy.num_replicas_in_sync))
-        else:    params = read_params()
-
+        else:
+            params = read_params()
             logging.info('Using single GPU, not distributed')
             self.context_manager = contextlib.nullcontext()  # does nothing, just a convenience for clean code
 

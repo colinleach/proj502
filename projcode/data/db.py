@@ -2,9 +2,9 @@
 import psycopg2
 import yaml
 from pathlib import Path
-
-# from logger import Logger
 import logging
+
+# from utils import read_params
 
 
 class DB():
@@ -15,12 +15,12 @@ class DB():
     `./gzoo.yaml`.
     """
 
-    def __init__(self):
+    def __init__(self, params: dict):
         """
         Reads the connection parameters, makes the connection and a cursor
         """
 
-        params = self.read_params()
+        # params = read_params()
 
         inf = f"dbname={params['dbname']} user={params['username']}"
         inf += f"  host='{params['host']}' password={params['password']}"
@@ -30,18 +30,18 @@ class DB():
 
         # self.logger = logger
 
-    @staticmethod
-    def read_params():
-        """
-        Needs the gzoo.yaml parameter file to be in the current directory
-
-        :return: parameter dictionary
-        """
-
-        filename = '../gzoo.yaml'
-        with open(filename) as file:
-            params = yaml.full_load(file)
-            return params
+    # @staticmethod
+    # def read_params():
+    #     """
+    #     Needs the gzoo.yaml parameter file to be in the current directory
+    #
+    #     :return: parameter dictionary
+    #     """
+    #
+    #     filename = '../gzoo.yaml'
+    #     with open(filename) as file:
+    #         params = yaml.full_load(file)
+    #         return params
 
     def get_cursor(self):
         "A simple getter method"

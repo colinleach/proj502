@@ -35,11 +35,27 @@ class ViewPredictions:
     def write_feather(self, feather_file: Path):
         self.results.to_feather(feather_file)
 
+    def normalize(self, df: pd.DataFrame = None) -> None:
+
+        if df is None:
+            df = self.results
+        sub_dfs = [self.ids, ]
+        for question in decals_pairs:
+            print(question)
+            options = decals_pairs[question]
+            pairs = [question + opt for opt in options]
+            df_subset = df.loc[:, pairs]
+            sums = df_subset.sum(axis=1, numeric_only=True)
+            for col in range(df_subset.shape[1]):
+                df_subset.iloc[:, col] /= sums
+            sub_dfs.append(df_subset)
+        self.normed = pd.concat(sub_dfs, axis=1)
+
     @staticmethod
     def summarize(df: pd.DataFrame, output: pd.DataFrame):
         """
 
-        :param df:
+        :param df: all predictions, un-normalized
         :param output:
         :return:
         """
@@ -53,6 +69,26 @@ class ViewPredictions:
                                  / df_subset.sum(axis=1, numeric_only=True)
             summary['choice'] = summary.values.tolist()
             output[question] = summary['choice']
+        return output
+
+    @staticmethod
+    def summary_dict(df: pd.Series) -> dict:
+        """
+
+        :param df: One row of predictions df
+        :return: dictionary with questions as keys, list of (answer, prob) tuples as values
+        """
+
+        output = {'file_loc': df['file_loc']}
+        for question in decals_pairs:
+            options = decals_pairs[question]
+            pairs = [question + opt for opt in options]
+            subset = list(df.loc[pairs])
+            subset /= sum(subset)
+            preds = [(resp[1:], pct) for resp, pct in zip(options, subset)]
+            preds.sort(key=lambda y: y[1], reverse=True)
+            #         print(preds)
+            output[question] = preds
         return output
 
     def make_prediction_summaries(self):
@@ -101,7 +137,11 @@ if __name__ == "__main__":
     catalog_file = dataroot / 'shards/decals/test_shards/test_df.csv'
     vp = ViewPredictions()
     vp.read_predictions(save_loc)
-    vp.make_prediction_summaries()
-    vp.make_observed_summaries(catalog_file)
-    comp = vp.one_comparison(20)
-    print(comp)
+    # vp.make_prediction_summaries()
+    # vp.make_observed_summaries(catalog_file)
+    # comp = vp.one_comparison(20)
+    # print(comp)
+    vp.normalize()
+    print(vp.normed)
+
+
