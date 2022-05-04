@@ -8,12 +8,12 @@ from zoobot.shared.label_metadata import decals_pairs
 
 class ViewPredictions:
 
-    # def __init__(self, save_loc: Path, feather_file: Path = None):
-    #     if feather_file is None:
-    #         self.read_predictions(save_loc)
-    #     else:
-    #         self.read_feather(feather_file)
-    #     self.make_summaries()
+    def __init__(self, save_loc: Path, feather_file: Path = None):
+        if feather_file is None:
+            self.read_predictions(save_loc)
+        else:
+            self.read_feather(feather_file)
+        self.normalize()
 
     def read_predictions(self, save_loc):
         with h5py.File(save_loc, "r") as f:
@@ -41,11 +41,12 @@ class ViewPredictions:
             df = self.results
         sub_dfs = [self.ids, ]
         for question in decals_pairs:
-            print(question)
             options = decals_pairs[question]
             pairs = [question + opt for opt in options]
             df_subset = df.loc[:, pairs]
             sums = df_subset.sum(axis=1, numeric_only=True)
+            # explicit loop over columns is clunky but fixes a memory problem
+            # could maybe fix with index reset??
             for col in range(df_subset.shape[1]):
                 df_subset.iloc[:, col] /= sums
             sub_dfs.append(df_subset)
@@ -129,19 +130,31 @@ class ViewPredictions:
         comp['obs_confidence'] = [obs[q][1] for q in questions]
         return example['file_loc'], comp
 
+    def top_n(self, colname, n=10):
+        """
+
+        :param colname:
+        :param n:
+        :return:
+        """
+
+        to_sort = self.normed[['file_loc', colname]].copy()
+        sorted = to_sort.sort_values(by=[colname], ascending=False)
+        return sorted.head(n)
+
 
 if __name__ == "__main__":
     params = read_params()
     dataroot = Path(params['dataroot'])
     save_loc = dataroot / 'results/predictions/decals.hdf5'
     catalog_file = dataroot / 'shards/decals/test_shards/test_df.csv'
-    vp = ViewPredictions()
-    vp.read_predictions(save_loc)
+    vp = ViewPredictions(save_loc)
+    # vp.read_predictions()
     # vp.make_prediction_summaries()
     # vp.make_observed_summaries(catalog_file)
     # comp = vp.one_comparison(20)
     # print(comp)
-    vp.normalize()
-    print(vp.normed)
+    # vp.normalize()
+    print(vp.top_n('merging_merger', 3))
 
 
