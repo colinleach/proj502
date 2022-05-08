@@ -274,8 +274,9 @@ For DECaLS, the batch size needed to be reduced to 32 to fit in GPU memory. Trai
 
 \begin{figure}[h!]
 	\gridline{\fig{J110001.05+010644.0.pdf}{0.6\textwidth}{(a)}}
-	\gridline{\fig{J110459.08+121820.3.pdf}{0.6\textwidth}{(b)}}
-	\caption{Raw images used for GZ2 (left) and DECaLS (right) \label{fig:images}}
+%	\gridline{\fig{J110459.08+121820.3.pdf}{0.6\textwidth}{(b)}}
+	\gridline{\fig{J110254.80+325229.0_3.pdf}{0.8\textwidth}{(b)}}
+	\caption{Raw images used for GZ2 at default resolution (left) and zoomed (center); DECaLS (right) \label{fig:images}}
 \end{figure}
 
 It was not immediately clear why the DECaLS run looks better than the GZ2 run. Preparation of data shards used the same code and no error has yet been found. Other hypotheses include the different batch size and different image size and quality. Batch size was easiest to test, so GZ2 training was repeated with batches of 32 as in Figure \ref{fig:train_plots}(c). This was not encouraging: training now looks worse without validation looking better.
@@ -286,12 +287,10 @@ The respective catalogs share no common ID field, but a match on RA/Dec coordina
 
 By default, the SDSS cutout service supplies images at a scale of 0.4 arcsec/pixel. As a first attempt to do better, new images were downloaded at 0.1 arcsec/pixel, with the SDSS server handling any necessary pixel interpolation.
 
-\todo show examples
-
 There are also significant differences in image preparation. W+20 gives little detail about this for GZ2, so the simple method described in section \ref{images} was followed.  In contrast, W+21 describes a more complex process, starting from FITS data files at native telescope resolution. Something equivalent may be possible for SDSS, but  this is not an urgent priority for an ASTR 502 term paper. From this point only the DECaLS survey is used.
 
 
-\subsection{Training on Colab}
+\subsection{Training on Colab} \label{sec:colabtrain}
 
 All relevant files were copied to Google Drive \todo size, from where they could be mounted in a Colab notebook. Training with batch size 128 used around 95\% of the 16GB memory. At around 15 min/epoch, both GZ2 and DECaLS took approximately 12 h to converge. Results, shown in Figure \ref{fig:train_colab}, are broadly similar to those obtained locally.
 
@@ -379,7 +378,7 @@ Similarly, all volunteers are asked about possible mergers, with the results in 
 
 Where the prediction is uncertain between two choices, such as with 0.48 versus 0.45 probabilities, this may be a failure of the model. Perhaps more likely, it reflects genuine ambiguity in the image and a need for humans to take a closer look. Triaging images to use humans more efficiently was, of course, an original aim of this research. Also, there is some data to show that volunteers are often divided about the same ambiguous images, discussed in W+21. The GZ team classifies ``confident'' galaxies as those where at least 80\% of the volunteers agree on a classification \citep{2019MNRAS.484...93D}, and these are just a subset of the total.
 
-An alternative approach may better use the strengths of the model: identify the top-$N$ galaxies confidently predicted to have a particular feature. This proved quick and easy, with a few examples shown in Figure \ref{fig:top5}. We could argue with the precise nomenclature, but this could be a simple and useful addition to survey data pipelines such as Rubin.\footnote{Other problems are harder. Several years ago I heard an IT engineer from LSST describe their hardware strategy as ``delay purchase reqs until the last possible moment and hope that Moore's Law saves us''. We were both drinking beer at the time (but you already guessed that).}
+An alternative approach may better use the strengths of the model: identify the top-$N$ galaxies confidently predicted to have a particular feature. This proved quick and easy, with a few examples shown in Figure \ref{fig:top5}. We could argue with the precise nomenclature, but this could be a simple and useful addition to survey data pipelines such as Rubin.\footnote{Other problems are harder. Several years ago I heard an IT engineer from LSST describe their hardware strategy as ``delay purchase orders until the last possible moment and hope that Moore's Law saves us''. We were both drinking beer at the time (but you already guessed that).}
 
 \begin{figure}
 	\gridline{\fig{merging_merger_5.pdf}{\textwidth}{Mergers}}
@@ -389,15 +388,47 @@ An alternative approach may better use the strengths of the model: identify the 
 \end{figure}
 
 
+\section{Fine-tuning and Transfer Learning}
+
+So far, the model is useful for most but not all of the parameters in the DECaLS catalog. The next steps use this as a starting point to train other models, either to answer different questions with DECaLS, or to use other surveys as input.
+
+\subsection{Fine-tuning for DECaLS}
+
+Although the GZ DECaLS catalog contains fields for rare features such as rings, lenses and dust lanes, theses are not included in the existing CNN model. Retraining the model to predict one of these features is a simple example of fine-tuning.
+
+Zoobot includes an example set of 470 images and a CSV catalog matching file locations to a ring/no-ring field, balanced to have roughly equal numbers of each. Generating such a catalog needs some effort from humans, but far less than the big GZ classifications. 
+
+These images were split into training and validation sets, the pretrained model from Section \ref{sec:colabtrain} was loaded with most of the layers frozen, then new final layers were added and the model retrained as a ring predictor. Locally, this ran with batch size 64 in less than 2 minutes, converging after 46 epochs.
+
+Because the output is much simpler in this case, a single sigmoid value for each galaxy, the ring model is easier to understand than the full model. The loss function is a standard binary crossentropy and the accuracy on the class-balanced validation set converges to about 0.77.
+
+The fine-tuned model was used to predict rings for the 272,725 galaxies in the DECaLS catalog: this time unbalanced, so the prior for having a ring is much less than $0.5$. Running locally, this took about 15 min.
+
+Unfortunately, the results were disappointing. Prediction confidence was $<0.75$ in all cases, and on viewing the top 10 images there were no convincing rings.
+
+Better results were reported in \citet{walmsley_galaxy_2022}, suggesting improvement is possible. Zoobot documentation gives a clue:
+
+\begin{quote}
+	 Zoobot includes two complete working examples:
+
+finetune\_minimal.py shows how to partially finetune a model to classify ring galaxies using an example dataset. It is designed to be easy to understand.
+
+finetune\_advanced.py solves the same problem with some additional tips and tricks: filtering the dataset, balancing the classes (rings are rare), and unfreezing the model.
+\end{quote}
+
+\subsection{Transfer Learning for other surveys}
+
+\todo add 
+
+
 \section{PyTorch Code}
 
 
 \todo add 
 
-\section{Transfer Learning}
+\section{Conclusions}
 
-\todo add 
-
+\todo add
 
 
 \bibliography{GZML}{}
