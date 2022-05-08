@@ -55,8 +55,6 @@ class FineTune:
         :param csv_path: catalog file
         """
 
-        # TODO you'll want to replace this with your own data
-        #  'data/example_ring_catalog_basic.csv'
         df = pd.read_csv(csv_path)
         paths = list(df['local_png_loc'])
         labels = list(df['ring'].astype(int))
@@ -92,7 +90,7 @@ class FineTune:
         self.train_dataset = preprocess.preprocess_dataset(raw_train_dataset, preprocess_config)
         self.val_dataset = preprocess.preprocess_dataset(raw_val_dataset, preprocess_config)
 
-    def load_model(self, pretrained_checkpoint: Path):
+    def load_old_model(self, pretrained_checkpoint: Path):
         """
         Load the pretrained model (without the "head" output layer), freeze it, and add a new head
         """
@@ -175,14 +173,13 @@ class FineTune:
         logging.info('Mean validation loss: {:.3f} (var {:.4f})'.format(np.mean(losses), np.var(losses)))
         # should train to a loss of around 0.54, equivalent to 75-80% accuracy on the (class-balanced) validation set
 
-    def make_predictions(self):
+    def make_predictions(self, paths_pred: Path, predictions_loc: Path):
         """
         Well done!
 
         You can now use your finetuned models to make predictions on new data..
         See make_predictions.py for a self-contained example.
         """
-        paths_pred = self.paths_val  # TODO for simplicitly I'll just make more predictions on the validation images, but you'll want to change this
         raw_pred_dataset = image_datasets.get_image_dataset(paths_pred, file_format=self.file_format,
                                                             requested_img_size=self.requested_img_size,
                                                             batch_size=self.batch_size)
@@ -205,9 +202,8 @@ class FineTune:
                 zip(predictions, ordered_paths)]
         pred_df = pd.DataFrame(data=data)
 
-        example_predictions_loc = 'results/finetune_minimal/example_predictions.csv'
-        pred_df.to_csv(example_predictions_loc, index=False)
-        logging.info(f'Example predictions saved to {example_predictions_loc}')
+        pred_df.to_csv(predictions_loc, index=False)
+        logging.info(f'Predictions saved to {predictions_loc}')
 
 
 if __name__ == '__main__':
@@ -219,9 +215,13 @@ if __name__ == '__main__':
     save_loc = dataroot / f'results/finetune/minimal_{datetime.now().strftime("%Y%m%d-%H%M%S")}'
     save_loc.mkdir(parents=True)
     logging.info(f"Output to {save_loc}")
+    predictions_loc = dataroot / f'predictions/finetune/minimal_{datetime.now().strftime("%Y%m%d-%H%M%S")}.csv'
+    # predictions_loc.mkdir(parents=True)
+    logging.info(f"Predictions to {predictions_loc}")
+
     ft = FineTune(params)
     ft.setup_data(csv_path)
     ft.preprocess_data()
-    ft.load_model(pretrained_checkpoint)
+    ft.load_old_model(pretrained_checkpoint)
     ft.retrain(save_loc)
-
+    ft.make_predictions(ft.paths_val, predictions_loc)
