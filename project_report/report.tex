@@ -292,7 +292,7 @@ There are also significant differences in image preparation. W+20 gives little d
 
 \subsection{Training on Colab} \label{sec:colabtrain}
 
-All relevant files were copied to Google Drive \todo size, from where they could be mounted in a Colab notebook. Training with batch size 128 used around 95\% of the 16GB memory. At around 15 min/epoch, both GZ2 and DECaLS took approximately 12 h to converge. Results, shown in Figure \ref{fig:train_colab}, are broadly similar to those obtained locally.
+All relevant files were copied to Google Drive (more than 100 GB), from where they could be mounted in a Colab notebook. Training with batch size 128 used around 95\% of the 16GB memory. At around 15 min/epoch, both GZ2 and DECaLS took approximately 12 h to converge. Results, shown in Figure \ref{fig:train_colab}, are broadly similar to those obtained locally.
 
 \begin{figure}
 	\epsscale{0.7}
@@ -416,19 +416,26 @@ finetune\_minimal.py shows how to partially finetune a model to classify ring ga
 finetune\_advanced.py solves the same problem with some additional tips and tricks: filtering the dataset, balancing the classes (rings are rare), and unfreezing the model.
 \end{quote}
 
+The training described earlier in this section followed the minimal example. Repeating using the advanced method is a current aim.
+
 \subsection{Transfer Learning for other surveys}
 
-\todo add 
+Both GZ2 (SDSS) and GZ DECaLS models were trained from scratch. Repeating this for future large surveys such as Rubin is affordable in terms of computing resource, but would require too many volunteers. A better approach is to start from the existing DECaLS model with early layers frozen, then use a few hundred volunteer classifications on the new survey to refine the weights.
+
+This has not yet been done for the ASTR 502 course. Exploring either Hubble or \href{http://candels.ucolick.org/}{CANDELS} data is planned for the near future, as GZ catalogs are available for both.
 
 
 \section{PyTorch Code}
 
-
-\todo add 
+Any plans to write a PyTorch version of the original Keras code were abandoned when this was unexpectedly pushed to the zoobot repo by other developers. Updates appear to have slowed in recent weeks, so this is probably a good time start testing it (after the course ends).  
 
 \section{Conclusions}
 
-\todo add
+The objectives of this term paper evolved significantly during the semester, not least because the lead author of W+20 continued to develop the code in ways that overlapped with my original plans.
+
+Reproducing the published results was partly successful with SDSS data (as in W+20) and mostly successful with DECaLS data (W+21). Models were trained, and were used to make some apparently sensible predictions on tens of thousands on new galaxy images. This work remains incomplete as the semester ends, but some gaps are likely to be filled in the coming weeks.
+
+Most importantly, published and peer-reviewed galaxy models are now available and have been shown to be usable in morphology classification. One can only hope that fewer astronomers in future will use ImageNet as a starting point for building new CNNs. 
 
 
 \bibliography{GZML}{}
